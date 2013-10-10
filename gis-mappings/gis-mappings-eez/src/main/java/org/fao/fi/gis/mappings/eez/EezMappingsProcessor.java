@@ -21,24 +21,38 @@ import org.opengis.filter.Filter;
 import org.opengis.filter.FilterFactory;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.stream.JsonReader;
 
 /**
  * Processor to establish sovereignty & exploitation rights EEZ relationships.
+ * 
  * Notes:
  * - Sovereignty relationship: refers to concept of Country
  * - Exploitation rights relationship: refers to concept of Flagstate
  * 
+ * Limitations
+ * - The processor relies on JSP FLOD services to get current
+ * content. A Java FLOD API should be use instead in future
+ * 
+ * - The processor provides an adhoc way to produce relationships deltas (ie those FLOD
+ *  has to update because they changed). Future enhancements should consider top-level
+ * interface to give such kind of update
+ * 
  * @author eblondel
- *
+ * 
  */
 public class EezMappingsProcessor {
 	
 	
 	private static String FLOD_FLAGSTATE_SERVICE = "http://www.fao.org/figis/flod/askflod/json/isflagstate.jsp?code=";
 	private static String wfsGetCap = "http://geo.vliz.be/geoserver/ows?service=WFS&version=1.0.0&request=GetCapabilities";
+	
+	private static String FLOD_SOV_SERVICE = "http://www.fao.org/figis/flod/askflod/json/eez4c.jsp?code=";
+	private static String FLOD_EXPL_SERVICE = "http://www.fao.org/figis/flod/askflod/json/eez4fs.jsp?code=";
+	
 	
 	private static String EEZ_NAME = "country";
 	private static String EEZ_LONGNAME = "eez";
@@ -147,7 +161,7 @@ public class EezMappingsProcessor {
 	 * @return
 	 * @throws Exception
 	 */
-	public JsonObject execute() throws Exception{
+	public JsonObject execute(Boolean flodLookup, Boolean includeErrors) throws Exception{
 		
 		//prepare output
 		final JsonObject root = new JsonObject();
@@ -161,8 +175,10 @@ public class EezMappingsProcessor {
 		Iterator<String> iterator = this.getCodeList().keySet().iterator();
 		while(iterator.hasNext()){
 			Country cnt = new Country(iterator.next(), featureSource, codelist);
-			JsonObject output = cnt.buildJsonOutput();
-			items.add(output);
+			JsonObject output = cnt.buildJsonOutput(flodLookup, includeErrors);
+			if(output != null){
+				items.add(output);	
+			}
 		}
 
 		return root;
@@ -344,55 +360,109 @@ public class EezMappingsProcessor {
 		 * @return
 		 * @throws Exception 
 		 */
-		public JsonObject buildJsonOutput() throws Exception{
-			JsonObject mapping = new JsonObject();
+		public JsonObject buildJsonOutput(Boolean flodLookup, Boolean includeErrors) throws Exception{
 			
-			//add flagstate iso3 URI
-			mapping.addProperty("uri",FLOD_FLAGSTATE_BASEURI+"/"+this.getCode().toLowerCase());
-			
-			//add SOVEREIGNTY mapping
-			Map<String, String> sovEEZs = this.getEEZSovereigntyRights();
-			if(sovEEZs.size() > 0){
-				JsonArray eezList = new JsonArray();
-				for(String eez : sovEEZs.keySet()){
-					JsonObject eezObj = new JsonObject();
-					eezObj.addProperty("uri", FLOD_EEZ_BASEURI+"/"+eez);
-					eezObj.addProperty("name", sovEEZs.get(eez));
-					eezList.add(eezObj);
-				}
-				mapping.add("sovereigntyRights", eezList);
-			}else{
-				mapping.add("sovereigntyRights", new JsonArray());
-			}
-			
-			//add EXPLOITATION RIGHTS mapping
-			Map<String, String> expEEZs = this.getEEZExploitationRights();
-			if(expEEZs.size() > 0){
-				JsonArray eezList = new JsonArray();
-				for(String eez : expEEZs.keySet()){
-					JsonObject eezObj = new JsonObject();
-					eezObj.addProperty("uri", FLOD_EEZ_BASEURI+"/"+eez);
-					eezObj.addProperty("name", expEEZs.get(eez));
-					eezList.add(eezObj);
-
-				}
-				mapping.add("exploitationRights", eezList);
-			}else{
-				mapping.add("exploitationRights", new JsonArray());
-			}
+			JsonObject mapping = null;
+			String error = null;
+			boolean hasError = false;
 			
 			//add messages
 			if (this.getCode().length() < 3) {
-				mapping.addProperty(
-						"message",
-						this.getCode()
-								+ " is not an ISO3 code. Action required at source level");
-			} else if (this.getCode().length() > 3
-					|| this.getCode().contains("-")) {
-				mapping.addProperty(
-						"message",
-						this.getCode()
-								+ " is not an ISO3 code. Composite EEZ detected. Action required at source level");
+				error = this.getCode()+" is not an ISO3 code. Action required at source level";
+				hasError = true;
+				
+			} else if (this.getCode().length() > 3 || this.getCode().contains("-")) {
+				error = this.getCode()+ " is not an ISO3 code. Composite EEZ detected. Action required at source level";
+				hasError = true;
+				
+			}
+			
+			if(!hasError){
+	
+				mapping = new JsonObject();
+				
+				List<String> sovCurrentList = getCurrentSovereigntyRights(this.getCode());
+				Map<String, String> sovEEZs = this.getEEZSovereigntyRights();
+				List<String> sovNewList = getURIs(FLOD_EEZ_BASEURI, sovEEZs);
+				boolean addSovMapping = (sovCurrentList.size() != sovNewList.size() && !sovCurrentList.containsAll(sovNewList));
+				
+				List<String> expCurrentList = getCurrentExploitationRights(this.getCode());
+				Map<String, String> expEEZs = this.getEEZExploitationRights();
+				List<String> expNewList = getURIs(FLOD_EEZ_BASEURI, expEEZs);
+				boolean addExpMapping = (expCurrentList.size() != expNewList.size() && !expCurrentList.containsAll(sovNewList));
+				
+				//add flagstate iso3 URI
+				if(flodLookup){
+					if(addSovMapping || addExpMapping){
+						String flagstateURI = FLOD_FLAGSTATE_BASEURI +"/"+ this.getCode().toLowerCase();
+						mapping.addProperty("uri", flagstateURI);
+					}
+				}else{
+					String flagstateURI = FLOD_FLAGSTATE_BASEURI +"/"+ this.getCode().toLowerCase();
+					mapping.addProperty("uri", flagstateURI);
+				}
+				
+				//add SOVEREIGNTY mapping			
+				if(flodLookup){
+					if(addSovMapping){		
+						JsonArray eezList = new JsonArray();
+						for(String uri : sovNewList){
+							JsonObject eezObj = new JsonObject();
+							eezObj.addProperty("uri", uri);
+							eezObj.addProperty("name", sovEEZs.get(uri.split(FLOD_EEZ_BASEURI+"/")[1]));
+							eezList.add(eezObj);
+						}
+						mapping.add("sovereigntyRights", eezList);
+					}
+					
+					//add EXPLOITATION RIGHTS mapping
+					if(addExpMapping){
+						JsonArray eezList = new JsonArray();
+						for(String uri : expNewList){
+							JsonObject eezObj = new JsonObject();
+							eezObj.addProperty("uri", uri);
+							eezObj.addProperty("name", expEEZs.get(uri.split(FLOD_EEZ_BASEURI+"/")[1]));
+							eezList.add(eezObj);
+
+						}
+						mapping.add("exploitationRights", eezList);
+					}
+				}else{
+					if(sovEEZs.size() > 0){		
+						JsonArray eezList = new JsonArray();
+						for(String uri : sovNewList){
+							JsonObject eezObj = new JsonObject();
+							eezObj.addProperty("uri", uri);
+							eezObj.addProperty("name", sovEEZs.get(uri.split(FLOD_EEZ_BASEURI+"/")[1]));
+							eezList.add(eezObj);
+						}
+						mapping.add("sovereigntyRights", eezList);
+					}else{
+						mapping.add("sovereigntyRights", new JsonArray());
+					}
+					
+					//add EXPLOITATION RIGHTS mapping
+					if(expEEZs.size() > 0){
+						JsonArray eezList = new JsonArray();
+						for(String uri : expNewList){
+							JsonObject eezObj = new JsonObject();
+							eezObj.addProperty("uri", uri);
+							eezObj.addProperty("name", expEEZs.get(uri.split(FLOD_EEZ_BASEURI+"/")[1]));
+							eezList.add(eezObj);
+
+						}
+						mapping.add("exploitationRights", eezList);
+					}else{
+						mapping.add("exploitationRights", new JsonArray());
+					}
+				}
+				
+				
+			}else{
+				if(includeErrors){
+					mapping = new JsonObject();
+					mapping.addProperty("warning", error);
+				}
 			}
 			
 			return mapping;
@@ -428,5 +498,81 @@ public class EezMappingsProcessor {
 		return result;
 	}
 	
-
+	
+	/**
+	 * Look to the current FLOD EEZ relationships content
+	 * 
+	 * @param code
+	 * @return
+	 * @throws IOException 
+	 * @throws InterruptedException 
+	 */
+	private static List<String> getCurrentEEZRelationships(String service, String code) throws IOException, InterruptedException{
+		List<String> result = new ArrayList<String>();
+		
+		//read Json data
+		URL dataURL = new URL(service + code);
+		JsonReader reader = new JsonReader(new InputStreamReader(dataURL.openStream()));
+		JsonParser parser = new JsonParser();
+		JsonObject flodJsonObject = parser.parse(reader).getAsJsonObject();
+		
+		JsonArray bindings = flodJsonObject
+				.get("results").getAsJsonObject()
+				.get("bindings").getAsJsonArray();
+		
+		Iterator<JsonElement> it = bindings.iterator();
+		while(it.hasNext()){
+			JsonObject obj = (JsonObject) it.next();
+			result.add(obj.get("eezCode").getAsJsonObject().get("value").toString());
+		}
+		
+		reader.close();
+		Thread.sleep(2000);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Provide the current Exploitation Rights
+	 * 
+	 * @param code (
+	 * @return the list of exploited EEZs
+	 * @throws IOException
+	 * @throws InterruptedException 
+	 */
+	public static List<String> getCurrentExploitationRights(String code) throws IOException, InterruptedException{
+		return getCurrentEEZRelationships(FLOD_EXPL_SERVICE, code);
+	}
+	
+	
+	/**
+	 * 
+	 * 
+	 * @param code
+	 * @return the list of EEZs
+	 * @throws IOException
+	 * @throws InterruptedException 
+	 */
+	public static List<String> getCurrentSovereigntyRights(String code) throws IOException, InterruptedException{
+		return getCurrentEEZRelationships(FLOD_SOV_SERVICE, code);
+	}
+	
+	
+	/**
+	 * Get list of URIs from mapping
+	 * 
+	 * @param baseuri
+	 * @param mapping
+	 * @return
+	 */
+	public static List<String> getURIs(String baseuri, Map<String,String> mapping){
+		List<String> result = new ArrayList<String>();
+		Iterator<String> it = mapping.keySet().iterator();
+		while(it.hasNext()){
+			result.add(baseuri +"/"+ it.next());
+		}
+		return result;
+	}
+	
 }

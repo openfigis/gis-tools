@@ -20,8 +20,8 @@ public class MappingsApp {
 	public static void main(String[] args) throws Exception {
 		
 		EezMappingsProcessor processor = new EezMappingsProcessor();
-		JsonObject result = processor.execute();
-		writeToJson(result, "c:/gis/eez/mappings_result_20131004.json");
+		JsonObject result = processor.execute(false, false);
+		writeToJson(result, "c:/gis/eez/eez_mappings_update_20131008.json");
 		
 	}
 	

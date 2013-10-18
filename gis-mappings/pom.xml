@@ -16,6 +16,20 @@
 
 	<dependencyManagement>
 		<dependencies>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.5.6</version>
+			</dependency>
+		
+			<!-- Geoserver manager -->
+			<dependency>
+				<groupId>it.geosolutions</groupId>
+				<artifactId>geoserver-manager</artifactId>
+				<version>1.6-SNAPSHOT</version>
+			</dependency>
+		
 			<!-- GeoTools -->
 			<dependency>
 				<groupId>org.geotools</groupId>
@@ -74,10 +88,24 @@
 			</releases>
 		</repository>
 
+		<!-- Geosolutions -->
+		<repository>
+			<id>geosolutions</id>
+			<name>GeoSolutions Repository</name>
+			<url>http://maven.geo-solutions.it</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+
 	</repositories>
 
 	<modules>
 		<module>eez</module>
+		<module>metadata</module>
 	</modules>
 
 </project>

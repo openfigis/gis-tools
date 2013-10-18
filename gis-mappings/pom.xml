@@ -77,7 +77,7 @@
 	</repositories>
 
 	<modules>
-		<module>gis-mappings-eez</module>
+		<module>eez</module>
 	</modules>
 
 </project>

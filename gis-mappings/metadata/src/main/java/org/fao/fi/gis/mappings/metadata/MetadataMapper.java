@@ -16,35 +16,45 @@ import it.geosolutions.geoserver.rest.decoder.utils.NameLinkElem;
 import it.geosolutions.geoserver.rest.encoder.metadatalink.GSMetadataLinkInfoEncoder;
 
 /**
- * This main class aims to give the 1st business logic to query the mapping
- * between FLOD codedentity URI & GIS OGC metadata URI
+ * This class aims to give the 1st business logic to query the mapping between
+ * FLOD codedentity URI & GIS OGC metadata URI
  * 
  * At now, it's specific to GeoServer implementation and uses the Java REST
  * client library "geoserver-manager".
  * 
  */
-public class Mapper {
+public class MetadataMapper {
 
-	public static void main(String[] args) throws MalformedURLException {
-		// prepare output
-		// a map giving codedentity / metadataURI pairs
-		Map<String, List<String>> results = new HashMap<String, List<String>>();
+	private GeoServerRESTReader reader;
+	private String workspace;
 
-		// Settings for GeoServer
-		// ---------------------
-		String gsBaseURL = "gsBaseUrl";
-		String gsUser = "gsUser";
-		String gsPassword = "gsPassword";
+	/**
+	 * Constructs the Metadata mapper
+	 * 
+	 * @param gsBaseURL
+	 * @param gsUser
+	 * @param gsPwd
+	 * @param ws
+	 * @throws MalformedURLException
+	 */
+	public MetadataMapper(String gsBaseURL, String gsUser, String gsPwd,
+			String ws) throws MalformedURLException {
+		this.reader = new GeoServerRESTReader(gsBaseURL, gsUser, gsPwd);
+		this.workspace = ws;
+	}
 
-		// workspace
-		// ---------
-		String workspace = "ws";
-
-		GeoServerRESTReader reader = new GeoServerRESTReader(gsBaseURL, gsUser,
-				gsPassword);
+	/**
+	 * Get the mappings between coded entity URI & GIS metadata URI
+	 * 
+	 * @return
+	 */
+	public Map<String, List<String>> getMappings() {
+		Map<String, List<String>> results = null;
 
 		RESTLayerList layers = reader.getLayers();
+
 		if (layers != null) {
+			results = new HashMap<String, List<String>>();
 			Iterator<NameLinkElem> it = layers.iterator();
 			while (it.hasNext()) {
 
@@ -55,13 +65,13 @@ public class Mapper {
 				if (layer != null) {
 
 					String codedEntity = null;
-					List<String> info = new ArrayList<String>();
+					
+					// Add both metadataURI & title
+					List<String> info = new ArrayList<String>(); 
 
 					// get FeatureType where properties (keywords, metadata,
 					// etc) are configured
 					RESTFeatureType ft = reader.getFeatureType(layer);
-
-					info.add(ft.getTitle()); // add title to infolist
 
 					// get reference codedentity added as featuretype keyword
 					List<String> keywords = ft.getKeywords();
@@ -75,7 +85,8 @@ public class Mapper {
 							if (metadataList.size() > 0) {
 								for (GSMetadataLinkInfoEncoder metadata : metadataList) {
 									if (metadata.getType().matches("text/xml")) {
-										info.add(metadata.getContent()); 
+										info.add(metadata.getContent());
+										info.add(ft.getTitle());
 										break;
 									}
 								}
@@ -91,12 +102,29 @@ public class Mapper {
 			}
 		}
 
-		// list the results
+		return results;
+	}
+
+	/**
+	 * Main class
+	 * 
+	 * @param args
+	 * @throws MalformedURLException
+	 */
+	public static void main(String[] args) throws MalformedURLException {
+
+		String gsBaseURL = "gsBaseURL";
+		String gsUser = "gsUser";
+		String gsPassword = "gsPwd";
+		String workspace = "ws";
+
+		MetadataMapper mapper = new MetadataMapper(gsBaseURL, gsUser,
+				gsPassword, workspace);
+		Map<String, List<String>> results = mapper.getMappings();
+
 		for (Entry<String, List<String>> entry : results.entrySet()) {
 			System.out.println(entry.getKey() + " | " + entry.getValue().get(0)
 					+ " | " + entry.getValue().get(1));
 		}
-
 	}
-
 }

@@ -11,8 +11,10 @@ import java.util.Map.Entry;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.decoder.RESTFeatureType;
 import it.geosolutions.geoserver.rest.decoder.RESTLayer;
+import it.geosolutions.geoserver.rest.decoder.RESTLayer21;
 import it.geosolutions.geoserver.rest.decoder.RESTLayerList;
 import it.geosolutions.geoserver.rest.decoder.utils.NameLinkElem;
+import it.geosolutions.geoserver.rest.encoder.identifier.GSIdentifierInfoEncoder;
 import it.geosolutions.geoserver.rest.encoder.metadatalink.GSMetadataLinkInfoEncoder;
 
 /**
@@ -48,7 +50,7 @@ public class MetadataMapper {
 	 * 
 	 * @return
 	 */
-	public Map<String, List<String>> getMappings() {
+	public Map<String, List<String>> getMappings(String authority) {
 		Map<String, List<String>> results = null;
 
 		RESTLayerList layers = reader.getLayers();
@@ -60,7 +62,7 @@ public class MetadataMapper {
 
 				// get the GS layer
 				String layerName = it.next().getName();
-				RESTLayer layer = reader.getLayer(workspace, layerName);
+				RESTLayer layer = (RESTLayer21) reader.getLayer(workspace, layerName);
 
 				if (layer != null) {
 
@@ -73,11 +75,11 @@ public class MetadataMapper {
 					// etc) are configured
 					RESTFeatureType ft = reader.getFeatureType(layer);
 
-					// get reference codedentity added as featuretype keyword
-					List<String> keywords = ft.getKeywords();
-					for (String keyword : keywords) {
-						if (keyword.contains("flod")) {
-							codedEntity = keyword;
+					// get reference codedentity added as authority-based Identifiers
+					List<GSIdentifierInfoEncoder> identifiers = layer.getEncodedIdentifierInfoList();
+					for (GSIdentifierInfoEncoder identifier : identifiers) {
+						if (identifier.getAuthority().matches(authority)) {
+							codedEntity = identifier.getIdentifier();
 
 							// get xml Metadata
 							List<GSMetadataLinkInfoEncoder> metadataList = ft
@@ -120,7 +122,7 @@ public class MetadataMapper {
 
 		MetadataMapper mapper = new MetadataMapper(gsBaseURL, gsUser,
 				gsPassword, workspace);
-		Map<String, List<String>> results = mapper.getMappings();
+		Map<String, List<String>> results = mapper.getMappings("FLOD");
 
 		for (Entry<String, List<String>> entry : results.entrySet()) {
 			System.out.println(entry.getKey() + " | " + entry.getValue().get(0)

@@ -21,7 +21,7 @@ public class MappingsApp {
 		
 		EezMappingsProcessor processor = new EezMappingsProcessor();
 		JsonObject result = processor.execute(false, false);
-		writeToJson(result, "c:/gis/eez/eez_mappings_update_20131008.json");
+		writeToJson(result, "c:/gis/eez/eez_mappings_update_20131022.json");
 		
 	}
 	

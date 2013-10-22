@@ -57,7 +57,7 @@ public class EezMappingsProcessor {
 	private static String EEZ_NAME = "country";
 	private static String EEZ_LONGNAME = "eez";
 	private static String EEZ_ISO3 = "iso_3digit";
-	private static String EEZ_ID = "eez_id";
+	private static String EEZ_ID = "mrgid";
 	private static String SOV_NAME = "sovereign";
 	
 	private static String FLOD_FLAGSTATE_BASEURI = "http://www.fao.org/figis/flod/entities/flagstatecode";

@@ -1,0 +1,138 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.fao.fi.gis</groupId>
+	<artifactId>gis-metadata</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<name>gis-metadata</name>
+	<url>http://www.fao.org/fi</url>
+
+	<developers>
+		<developer>
+			<id>eblondel</id>
+			<name>Emmanuel Blondel</name>
+			<organization>FAO</organization>
+			<organizationUrl>http://www.fao.org/fi</organizationUrl>
+			<email>emmanuel.blondel@fao.org</email>
+			<roles>
+				<role>Developer</role>
+			</roles>
+		</developer>
+	</developers>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<geotools.version>10-SNAPSHOT</geotools.version>
+		<geotoolkit.version>3.x-SNAPSHOT</geotoolkit.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+			<version>1.5.6</version>
+		</dependency>
+		
+
+		<!-- Geoserver manager -->
+		<dependency>
+			<groupId>it.geosolutions</groupId>
+			<artifactId>geoserver-manager</artifactId>
+			<version>1.6-SNAPSHOT</version>
+		</dependency>
+		<!-- Geonetwork manager -->
+		<dependency>
+			<groupId>it.geosolutions</groupId>
+			<artifactId>geonetwork-manager</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+		<!-- GeoToolKit -->
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-utility</artifactId>
+			<version>${geotoolkit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit.pending</groupId>
+			<artifactId>geotk-filter</artifactId>
+			<version>${geotoolkit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-referencing</artifactId>
+			<version>${geotoolkit.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-metadata</artifactId>
+			<version>${geotoolkit.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.geotoolkit.pending</groupId>
+			<artifactId>geotk-xml-feature-catalogue</artifactId>
+			<version>3.x-SNAPSHOT</version>
+		</dependency>
+
+		<!-- Geotools -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+			<version>${geotools.version}</version>
+		</dependency>
+		
+		<!-- JSON google library -->
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>osgeo</id>
+			<name>Open Source Geospatial Foundation Repository</name>
+			<url>http://repo.opengeo.org</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+
+		<!-- Geotoolkit -->
+		<repository>
+			<!-- Not needed for "*-geoapi-3.0" versions -->
+			<id>geotoolkit</id>
+			<name>Geotk repository</name>
+			<url>http://maven.geotoolkit.org/</url>
+		</repository>
+
+		<!-- Geosolutions -->
+		<repository>
+			<id>geosolutions</id>
+			<name>GeoSolutions Repository</name>
+			<url>http://maven.geo-solutions.it</url>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+		</repository>
+
+	</repositories>
+</project>

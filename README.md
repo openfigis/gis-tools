@@ -8,7 +8,7 @@ gis-mappings
 This module contains code to automatically build code mappings, such as:
 - Country-Flagstate / EEZs relationships
 - mappings between authority identifiers & associated GIS metadataURL
-- 
+
 gis-metadata
 ------------
 This module contains code to facilitate the management of GIS data & associated OGC/ISO standard metadata (ISO19115/19139).

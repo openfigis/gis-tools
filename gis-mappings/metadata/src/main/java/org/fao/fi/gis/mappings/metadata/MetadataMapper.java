@@ -1,7 +1,6 @@
 package org.fao.fi.gis.mappings.metadata;
 
 import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -50,13 +49,13 @@ public class MetadataMapper {
 	 * 
 	 * @return
 	 */
-	public Map<String, List<String>> getMappings(String authority) {
-		Map<String, List<String>> results = null;
+	public Map<String, Map<LayerProperty,String>> getMappings(String authority) {
+		Map<String, Map<LayerProperty,String>> results = null;
 
 		RESTLayerList layers = reader.getLayers();
 
 		if (layers != null) {
-			results = new HashMap<String, List<String>>();
+			results = new HashMap<String, Map<LayerProperty,String>>();
 			Iterator<NameLinkElem> it = layers.iterator();
 			while (it.hasNext()) {
 
@@ -69,7 +68,7 @@ public class MetadataMapper {
 					String codedEntity = null;
 					
 					// Add both metadataURI & title
-					List<String> info = new ArrayList<String>(); 
+					Map<LayerProperty,String> layerProperties = new HashMap<LayerProperty,String>(); 
 
 					// get FeatureType where properties (keywords, metadata,
 					// etc) are configured
@@ -87,8 +86,9 @@ public class MetadataMapper {
 							if (metadataList.size() > 0) {
 								for (GSMetadataLinkInfoEncoder metadata : metadataList) {
 									if (metadata.getType().matches("text/xml")) {
-										info.add(metadata.getContent());
-										info.add(ft.getTitle());
+										layerProperties.put(LayerProperty.NAME, ft.getName());
+										layerProperties.put(LayerProperty.TITLE, ft.getTitle());
+										layerProperties.put(LayerProperty.METADATAURL, metadata.getContent());
 										break;
 									}
 								}
@@ -98,7 +98,7 @@ public class MetadataMapper {
 					}
 
 					if (codedEntity != null) {
-						results.put(codedEntity, info);
+						results.put(codedEntity, layerProperties);
 					}
 				}
 			}
@@ -122,11 +122,15 @@ public class MetadataMapper {
 
 		MetadataMapper mapper = new MetadataMapper(gsBaseURL, gsUser,
 				gsPassword, workspace);
-		Map<String, List<String>> results = mapper.getMappings("FLOD");
+		Map<String, Map<LayerProperty, String>> results = mapper
+				.getMappings("FLOD");
 
-		for (Entry<String, List<String>> entry : results.entrySet()) {
-			System.out.println(entry.getKey() + " | " + entry.getValue().get(0)
-					+ " | " + entry.getValue().get(1));
+		for (Entry<String, Map<LayerProperty, String>> entry : results
+				.entrySet()) {
+			System.out.println(entry.getKey() + " | "
+					+ entry.getValue().get(LayerProperty.NAME) + " | "
+					+ entry.getValue().get(LayerProperty.TITLE) + " | "
+					+ entry.getValue().get(LayerProperty.METADATAURL));
 		}
 	}
 }

@@ -1,4 +1,4 @@
-package org.fao.fi.gis.util;
+package org.fao.fi.gis.metadata.util;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.fao.fi.gis.entity.EntityAddin;
+import org.fao.fi.gis.metadata.entity.EntityAddin;
 import org.geotoolkit.xml.Namespaces;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

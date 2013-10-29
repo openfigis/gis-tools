@@ -3,7 +3,7 @@ package org.fao.fi.gis.metadata;
 import java.io.File;
 import java.util.EnumSet;
 
-import org.fao.fi.gis.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.geotoolkit.xml.XML;
 import org.jdom.Element;
 

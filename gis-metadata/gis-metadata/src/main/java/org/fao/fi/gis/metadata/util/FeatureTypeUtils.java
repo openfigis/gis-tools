@@ -1,4 +1,4 @@
-package org.fao.fi.gis.util;
+package org.fao.fi.gis.metadata.util;
 
 import java.net.URL;
 import java.util.HashMap;

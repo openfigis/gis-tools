@@ -1,4 +1,4 @@
-package org.fao.fi.gis.metadata.rfb;
+package org.fao.fi.gis.metadata.collection.rfb;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

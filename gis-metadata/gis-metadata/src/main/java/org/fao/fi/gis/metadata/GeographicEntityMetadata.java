@@ -16,9 +16,9 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
-import org.fao.fi.gis.entity.EntityProperty;
-import org.fao.fi.gis.entity.GeographicEntity;
-import org.fao.fi.gis.util.Utils;
+import org.fao.fi.gis.metadata.entity.EntityProperty;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.util.Utils;
 import org.geotoolkit.internal.jaxb.gmx.Anchor;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
 import org.geotoolkit.metadata.iso.DefaultMetadata;

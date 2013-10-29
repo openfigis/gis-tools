@@ -26,7 +26,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>10-SNAPSHOT</geotools.version>
-		<geotoolkit.version>3.x-SNAPSHOT</geotoolkit.version>
+		<geotoolkit.version>3.21</geotoolkit.version>
 	</properties>
 
 	<dependencies>
@@ -75,7 +75,7 @@
 		<dependency>
 			<groupId>org.geotoolkit.pending</groupId>
 			<artifactId>geotk-xml-feature-catalogue</artifactId>
-			<version>3.x-SNAPSHOT</version>
+			<version>${geotoolkit.version}</version>
 		</dependency>
 
 		<!-- Geotools -->

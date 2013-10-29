@@ -1,4 +1,4 @@
-package org.fao.fi.gis.entity;
+package org.fao.fi.gis.metadata.entity;
 
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 

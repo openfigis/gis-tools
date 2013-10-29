@@ -19,9 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.fao.fi.gis.entity.EntityProperty;
-import org.fao.fi.gis.entity.GeographicEntity;
-import org.fao.fi.gis.util.Utils;
+import org.fao.fi.gis.metadata.entity.EntityProperty;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.util.Utils;
 
 import com.vividsolutions.jts.geom.Envelope;
 

@@ -1,4 +1,4 @@
-package org.fao.fi.gis.metadata.species;
+package org.fao.fi.gis.metadata.collection.species;
 
 import java.net.URISyntaxException;
 import java.util.Arrays;
@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.entity.EntityAddin;
-import org.fao.fi.gis.entity.EntityProperty;
-import org.fao.fi.gis.entity.GeographicEntity;
-import org.fao.fi.gis.entity.GeographicEntityImpl;
-import org.fao.fi.gis.entity.GisProperty;
 import org.fao.fi.gis.metadata.MetadataContentTemplate;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
+import org.fao.fi.gis.metadata.entity.EntityAddin;
+import org.fao.fi.gis.metadata.entity.EntityProperty;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
+import org.fao.fi.gis.metadata.entity.GisProperty;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 

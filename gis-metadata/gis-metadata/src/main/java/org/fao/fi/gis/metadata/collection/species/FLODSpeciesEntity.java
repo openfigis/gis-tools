@@ -1,4 +1,4 @@
-package org.fao.fi.gis.metadata.species;
+package org.fao.fi.gis.metadata.collection.species;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

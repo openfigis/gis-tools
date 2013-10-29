@@ -1,4 +1,4 @@
-package org.fao.fi.gis.entity;
+package org.fao.fi.gis.metadata.entity;
 
 public enum EntityAddin {
 

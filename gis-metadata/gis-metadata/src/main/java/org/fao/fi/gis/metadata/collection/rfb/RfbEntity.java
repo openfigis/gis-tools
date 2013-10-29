@@ -1,4 +1,4 @@
-package org.fao.fi.gis.metadata.rfb;
+package org.fao.fi.gis.metadata.collection.rfb;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -13,14 +13,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.entity.EntityAddin;
-import org.fao.fi.gis.entity.EntityProperty;
-import org.fao.fi.gis.entity.GeographicEntity;
-import org.fao.fi.gis.entity.GeographicEntityImpl;
-import org.fao.fi.gis.entity.GisProperty;
 import org.fao.fi.gis.metadata.MetadataContentTemplate;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
-import org.fao.fi.gis.metadata.species.SpeciesEntity.SpeciesProperty;
+import org.fao.fi.gis.metadata.collection.species.SpeciesEntity.SpeciesProperty;
+import org.fao.fi.gis.metadata.entity.EntityAddin;
+import org.fao.fi.gis.metadata.entity.EntityProperty;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
+import org.fao.fi.gis.metadata.entity.GisProperty;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;

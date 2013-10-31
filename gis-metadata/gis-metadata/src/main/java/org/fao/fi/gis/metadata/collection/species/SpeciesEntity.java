@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.metadata.MetadataContentTemplate;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 import org.fao.fi.gis.metadata.entity.EntityAddin;
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
+import org.fao.fi.gis.metadata.template.ContentTemplate;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -67,7 +67,7 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 	private Map<EntityProperty, List<String>> properties;
 	private Map<GisProperty, String> gisProperties;
 	
-	public SpeciesEntity(String code, MetadataContentTemplate template,
+	public SpeciesEntity(String code, ContentTemplate template,
 						String gsBaseURL, String gnBaseURL,
 						String srcWorkspace, String srcLayer, String srcAttribute,
 						String trgWorkspace, String trgLayerPrefix,
@@ -137,7 +137,7 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 	}
 
 	public String getViewerIdentifier() {
-		return this.getCode()+"-"+this.getSpecificProperties().get(SpeciesProperty.HABITAT).get(0);
+		return null;
 	}
 
 
@@ -158,4 +158,8 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 		return this.gisProperties;
 	}
 
+	public String getFactsheet(){
+		return "http://www.fao.org/fishery/"+this.getDomainName() + "/" + this.getFigisId();
+	}
+	
 }

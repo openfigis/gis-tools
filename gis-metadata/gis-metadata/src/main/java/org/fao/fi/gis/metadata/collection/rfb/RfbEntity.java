@@ -13,7 +13,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.metadata.MetadataContentTemplate;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 import org.fao.fi.gis.metadata.collection.species.SpeciesEntity.SpeciesProperty;
 import org.fao.fi.gis.metadata.entity.EntityAddin;
@@ -21,6 +20,7 @@ import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
+import org.fao.fi.gis.metadata.template.ContentTemplate;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
@@ -75,7 +75,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	private Map<GisProperty, String> gisProperties;
 	
 	
-	public RfbEntity(String code, MetadataContentTemplate template,
+	public RfbEntity(String code, ContentTemplate template,
 			String gsBaseURL, String gnBaseURL, String srcWorkspace,
 			String srcLayer, String srcAttribute, String trgWorkspace,String trgLayerPrefix,
 			Map<FeatureTypeProperty, Object> geoproperties,
@@ -145,6 +145,10 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	
 	public Map<GisProperty, String> getGisProperties() {
 		return this.gisProperties;
+	}
+	
+	public String getFactsheet(){
+		return "http://www.fao.org/fishery/"+this.getDomainName() + "/" + this.getFigisId();
 	}
 	
 	private void setRfbAbstract() throws ParserConfigurationException, SAXException, IOException{

@@ -145,6 +145,7 @@ public final class Utils {
 				+ "&elementSetName=full" + "&outputSchema=" + Namespaces.GMD
 				+ "&id=" + mdIdentifier;
 
+		System.out.println(metadataURL);
 		return metadataURL;
 	}
 

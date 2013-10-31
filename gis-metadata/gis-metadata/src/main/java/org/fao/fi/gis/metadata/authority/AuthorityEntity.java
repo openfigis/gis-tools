@@ -11,6 +11,7 @@ public enum AuthorityEntity {
 	FIGIS("FIGIS", "http://www.fao.org/figis"),
 	FLOD("FLOD", "http://www.fao.org/figis/flod"),
 	ASFIS("ASFIS", "http://www.fao.org/fishery/collection/asfis"),
+	VLIZ("VLIZ", "http://www.vliz.be"),
 	WORMS("WORMS", "http://www.marinespecies.org"),
 	HABITAT("HABITAT", null);
 

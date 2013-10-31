@@ -1,5 +1,6 @@
-package org.fao.fi.gis.metadata;
+package org.fao.fi.gis.metadata.template;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -14,10 +15,11 @@ import org.opengis.metadata.identification.TopicCategory;
  * @author eblondel
  *
  */
-public class MetadataContentTemplate {
+public class ContentTemplate {
 
 	private String collection;
 	private String collectionURL;
+	private boolean hasBaseTitle;
 	private String basetitle;
 	private String abstractText;
 	private String purpose;
@@ -27,8 +29,10 @@ public class MetadataContentTemplate {
 	private String disclaimer;
 	private Map<String,List<String>> thesaurusList;
 	private Set<TopicCategory> topicsList;
+	private ContactTemplate orgContact;
+	private List<ContactTemplate> individualContacts;
 	
-	public MetadataContentTemplate(){
+	public ContentTemplate(){
 	}	
 	
 	public void setCollection(String collection){
@@ -45,6 +49,14 @@ public class MetadataContentTemplate {
 	
 	public String getCollectionURL(){
 		return this.collectionURL;
+	}
+	
+	public void setHasBaseTitle(boolean hasbasetitle){
+		this.hasBaseTitle = hasbasetitle;
+	}
+	
+	public boolean getHasBaseTitle(){
+		return this.hasBaseTitle;
 	}
 	
 	public void setBaseTitle(String basetitle){
@@ -124,6 +136,25 @@ public class MetadataContentTemplate {
 	
 	public String getSupplementaryInformation(){
 		return this.supplementaryInfo;
+	}
+	
+	public void setOrganizationContact(ContactTemplate contact){
+		this.orgContact = contact;
+	}
+	
+	public ContactTemplate getOrganizationContact(){
+		return this.orgContact;
+	}
+	
+	public void addIndividualContact(ContactTemplate contact){
+		if(this.individualContacts == null){
+			this.individualContacts = new ArrayList<ContactTemplate>();
+		}
+		this.individualContacts.add(contact);
+	}
+	
+	public List<ContactTemplate> getIndividualContacts(){
+		return this.individualContacts;
 	}
 	
 }

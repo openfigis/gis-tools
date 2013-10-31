@@ -159,8 +159,12 @@ public class DataPublisher {
 			String metadataID) {
 
 		// target geoserver layer
-		String title = entity.getTemplate().getBaseTitle()
-				+ entity.getRefName();
+		String title = null;
+		if(entity.getTemplate().getHasBaseTitle()){
+			title = entity.getTemplate().getBaseTitle() + entity.getRefName();
+		}else{
+			title = entity.getRefName();
+		}
 
 		// Using geoserver-manager
 		// -----------------------
@@ -198,6 +202,7 @@ public class DataPublisher {
 		}
 
 		// virtual table (sql view)
+		//TODO not generic for "THE_GEOM" (uppercase is specific to Oracle)
 		VTGeometryEncoder gte = new VTGeometryEncoder("THE_GEOM",
 				"MultiPolygon", "4326");
 		String sql = "SELECT * FROM " + this.srcLayer + " WHERE "

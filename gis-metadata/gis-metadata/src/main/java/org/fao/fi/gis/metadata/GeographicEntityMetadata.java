@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.template.ContactTemplate;
 import org.fao.fi.gis.metadata.util.Utils;
 import org.geotoolkit.internal.jaxb.gmx.Anchor;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
@@ -50,6 +51,7 @@ import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.OnlineResource;
 import org.opengis.metadata.citation.PresentationForm;
+import org.opengis.metadata.citation.ResponsibleParty;
 import org.opengis.metadata.citation.Role;
 import org.opengis.metadata.citation.Telephone;
 import org.opengis.metadata.constraint.Constraints;
@@ -90,9 +92,10 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 
 	private Date lastRevisionDate;
 	private String lastVersion;
+	private String title;
 
 	Collection<? extends Constraints> constraints;
-	DefaultResponsibleParty FAO;
+	DefaultResponsibleParty ORGANIZATION;
 
 	/**
 	 * Constructs a GeographicEntity metadata
@@ -101,19 +104,21 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 	 * @throws ParseException
 	 * 
 	 */
-	public GeographicEntityMetadata(GeographicEntity entity,
-			String fileIdentifier, String revisionDate, String version
-
-	) throws URISyntaxException, ParseException {
+	public GeographicEntityMetadata(GeographicEntity entity, String revisionDate, String version) throws URISyntaxException, ParseException {
 
 		super();
 		this.entity = entity;
 
 		this.lastRevisionDate = sdf.parse(revisionDate);
 		this.lastVersion = version;
+		if(entity.getTemplate().getHasBaseTitle()){
+			this.title = entity.getTemplate().getBaseTitle() + entity.getRefName();
+		}else{
+			this.title = entity.getRefName();
+		}
 
 		// build the metadata
-		this.setIdentifier(fileIdentifier); // identifier
+		this.setIdentifier(entity.getIdentifier()); // identifier
 		this.setDateStamp(this.lastRevisionDate);
 
 		this.setLocales(Arrays.asList(Locale.ENGLISH)); // Locales
@@ -148,7 +153,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 	}
 
 	protected DefaultResponsibleParty getOrganization() {
-		return this.FAO;
+		return this.ORGANIZATION;
 	}
 
 	/**
@@ -173,29 +178,28 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 	 * @throws URISyntaxException
 	 */
 	private void setOrganization() throws URISyntaxException {
-		// FAO responsible party
-		this.FAO = new DefaultResponsibleParty();
+		// Main responsible party
+		this.ORGANIZATION = new DefaultResponsibleParty();
 
 		// contact info
-		final DefaultContact contactFAO = new DefaultContact();
-		final DefaultOnlineResource resourceFAO = new DefaultOnlineResource();
-		resourceFAO.setName("FAO Fisheries and Aquaculture Department");
-		resourceFAO.setLinkage(new URI("http://www.fao.org/fishery/en"));
-		contactFAO.setOnlineResource(resourceFAO);
+		final DefaultContact contactORG = new DefaultContact();
+		final DefaultOnlineResource resourceORG = new DefaultOnlineResource();
+		resourceORG.setName(entity.getTemplate().getOrganizationContact().getName());
+		resourceORG.setLinkage(new URI(entity.getTemplate().getOrganizationContact().getUrl()));
+		contactORG.setOnlineResource(resourceORG);
 
 		// Address
-		final DefaultAddress addressFAO = new DefaultAddress();
-		addressFAO.getDeliveryPoints().add("Viale delle Terme di Caracalla"); // deliveryPoint
-		addressFAO.setCity(new SimpleInternationalString("Rome")); // city
-		addressFAO.setPostalCode("00153"); // postal code
-		addressFAO.setCountry(new SimpleInternationalString("Italy")); // country
-		contactFAO.setAddress(addressFAO);
+		final DefaultAddress addressORG = new DefaultAddress();
+		addressORG.getDeliveryPoints().add(entity.getTemplate().getOrganizationContact().getAddress()); // deliveryPoint
+		addressORG.setCity(new SimpleInternationalString(entity.getTemplate().getOrganizationContact().getCity())); // city
+		addressORG.setPostalCode(entity.getTemplate().getOrganizationContact().getPostalCode()); // postal code
+		addressORG.setCountry(new SimpleInternationalString(entity.getTemplate().getOrganizationContact().getCountry())); // country
+		contactORG.setAddress(addressORG);
 
-		FAO.setContactInfo((Contact) contactFAO);
-		FAO.setOrganisationName(new SimpleInternationalString(
-				"FAO Fisheries and Aquaculture Department"));// organization
-																// name
-		FAO.setRole(Role.OWNER);
+		ORGANIZATION.setContactInfo((Contact) contactORG);
+		ORGANIZATION.setOrganisationName(new SimpleInternationalString(
+				entity.getTemplate().getOrganizationContact().getOrgName()));
+		ORGANIZATION.setRole(Role.OWNER);
 	}
 
 	/**
@@ -206,74 +210,68 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 	 * 
 	 */
 	private void setContacts() throws URISyntaxException {
-		// Responsible party
-		// -----------------
+		
+		final List<ResponsibleParty> contacts = new ArrayList<ResponsibleParty>();
+		
+		for(ContactTemplate iContact : entity.getTemplate().getIndividualContacts()){
+		
+			DefaultResponsibleParty rp = new DefaultResponsibleParty();
+			
+			// contact info
+			final DefaultContact contact = new DefaultContact();
+			final DefaultOnlineResource resource = new DefaultOnlineResource();
+			resource.setName(iContact.getName());
+			resource.setLinkage(new URI(iContact.getUrl()));
+			contact.setOnlineResource(resource);
+			
+			// telephone
+			DefaultTelephone tel = null;
+			if(iContact.getMainPhone() != null){
+				if(tel == null){
+					tel = new DefaultTelephone();
+				}
+				tel.getVoices().add(iContact.getMainPhone());
+			}
+			if(iContact.getFax() != null){
+				if(tel == null){
+					tel = new DefaultTelephone();
+				}
+				tel.getVoices().add(iContact.getFax());
+			}
+			if(tel != null){
+				contact.setPhone((Telephone) tel);
+			}
 
-		// Responsible party 1
-		DefaultResponsibleParty responsibleParty1 = new DefaultResponsibleParty();
+			// Address
+			DefaultAddress address = null;
+			if(iContact.getAddress() != null){
+				if(address == null){
+					address = new DefaultAddress();
+				}
+				address.getDeliveryPoints().add(iContact.getAddress());
+				address.setCity(new SimpleInternationalString(iContact.getCity()));
+				address.setPostalCode(iContact.getPostalCode());
+				address.setCountry(new SimpleInternationalString(iContact.getCountry()));
+			}
+			if(iContact.getMainEmail() != null){
+				if(address == null){
+					address = new DefaultAddress();
+				}
+				address.getElectronicMailAddresses().add(iContact.getMainEmail());
+			}
+			if(address != null){
+				contact.setAddress(address);
+			}
 
-		// contact info
-		final DefaultContact contact = new DefaultContact();
-		final DefaultOnlineResource resource = new DefaultOnlineResource();
-		resource.setName("Food & Agriculture Organization of the United Nations");
-		resource.setLinkage(new URI("http://www.fao.org"));
-		contact.setOnlineResource(resource);
+			rp.setContactInfo((Contact) contact);
+			rp.setIndividualName(iContact.getIndividualName());
+			rp.setOrganisationName(new SimpleInternationalString(iContact.getOrgName()));
+			rp.setPositionName(new SimpleInternationalString(iContact.getPositionName()));
+			rp.setRole(Role.POINT_OF_CONTACT);
 
-		// telephone
-		final DefaultTelephone tel = new DefaultTelephone();
-		tel.getVoices().add("+39 06 570 55176");// voice
-		tel.getFacsimiles().add("+39 06 570 53020");// fax
-		contact.setPhone((Telephone) tel);
-
-		// Address
-		final DefaultAddress address = new DefaultAddress();
-		address.getDeliveryPoints().add("Viale delle Terme di Caracalla"); // deliveryPoint
-		address.setCity(new SimpleInternationalString("Rome")); // city
-		address.setPostalCode("00153"); // postal code
-		address.setCountry(new SimpleInternationalString("Italy")); // country
-		address.getElectronicMailAddresses().add("Fabio.Carocci@fao.org"); // email
-		contact.setAddress(address);
-
-		responsibleParty1.setContactInfo((Contact) contact);
-
-		responsibleParty1.setIndividualName("Fabio Carocci");// individual name
-		responsibleParty1.setOrganisationName(new SimpleInternationalString(
-				"FAO - Fisheries Management and Conservation Service"));// organization
-																		// name
-		responsibleParty1.setPositionName(new SimpleInternationalString(
-				"Fishery Resource Officer"));// position name
-		responsibleParty1.setRole(Role.POINT_OF_CONTACT);// role
-
-		// Responsible party 2
-		// *******************
-		DefaultResponsibleParty responsibleParty2 = new DefaultResponsibleParty();
-
-		// contact info
-		final DefaultContact contact2 = new DefaultContact();
-		final DefaultOnlineResource resource2 = new DefaultOnlineResource();
-		resource2
-				.setName("Food & Agriculture Organization of the United Nations");
-		resource2.setLinkage(new URI("http://www.fao.org"));
-		contact2.setOnlineResource(resource);
-
-		// Address
-		final DefaultAddress address2 = new DefaultAddress();
-		address2.getElectronicMailAddresses().add("Emmanuel.Blondel@fao.org"); // email
-		contact2.setAddress(address2);
-
-		responsibleParty2.setContactInfo((Contact) contact2);
-
-		responsibleParty2.setIndividualName("Emmanuel Blondel");// individual
-																// name
-		responsibleParty2
-				.setOrganisationName(new SimpleInternationalString(
-						"FAO - Fisheries and Aquaculture Department. Statistics and Information"));// organization
-																									// name
-		responsibleParty2.setPositionName(new SimpleInternationalString(
-				"GIS Consultant"));// position name
-		responsibleParty2.setRole(Role.POINT_OF_CONTACT);// role
-
-		this.setContacts(Arrays.asList(responsibleParty1, responsibleParty2));
+			contacts.add(rp);
+			this.setContacts(contacts);
+		}
 
 	}
 
@@ -342,19 +340,13 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 
 						// Usage for bibliography
 								new SimpleInternationalString(
-										"Usage subject to mandatory citation: (c) FAO, "
-												+ c.get(Calendar.YEAR)
-												+ ". "
-												+ entity.getTemplate()
-														.getCollection()
-												+ ". "
-												+ entity.getTemplate()
-														.getBaseTitle()
-												+ entity.getRefName()
-												+ " ("
-												+ entity.getCode()
-												+ "). "
-												+ "In: FAO Fisheries and Aquaculture Department [online]. Rome. [Cited <DATE>] "
+										"Usage subject to mandatory citation: (c) "+entity.getTemplate().getOrganizationContact().getAcronym()+", "
+												+ c.get(Calendar.YEAR)+ ". "
+												+ entity.getTemplate().getCollection()+ ". "
+												+ this.title
+												+ " ("+ entity.getCode()+ "). "
+												+ "In: "+entity.getTemplate().getOrganizationContact().getName()+" [online]. "
+												+ entity.getTemplate().getOrganizationContact().getCity()+". [Cited <DATE>] "
 												+ entity.getTemplate()
 														.getCollectionURL()),
 
@@ -379,7 +371,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 			DefaultDigitalTransferOptions option = new DefaultDigitalTransferOptions();
 			Set<OnlineResource> resources = new HashSet<OnlineResource>();
 
-			// resource 1 (FAO/FI website)
+			// website main resource
 			// ---------------------------
 			DefaultOnlineResource fiweb = new DefaultOnlineResource();
 			fiweb.setLinkage(new URI(entity.getTemplate().getCollectionURL()));
@@ -389,27 +381,30 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 			fiweb.setFunction(OnLineFunction.INFORMATION);
 			resources.add(fiweb);
 
-			// resource 1 (FAO/FI website)
+			// factsheet (if it exists)
 			// ---------------------------
-			DefaultOnlineResource factsheet = new DefaultOnlineResource();
-			factsheet.setLinkage(new URI("http://www.fao.org/fishery/"
-					+ entity.getFigisDomain() + "/" + entity.getFigisId()));
-			factsheet.setProtocol("WWW:LINK-1.0-http--link");
-			factsheet.setDescription(new SimpleInternationalString(
-					"Factsheet - Summary description"));
-			factsheet.setFunction(OnLineFunction.INFORMATION);
-			resources.add(factsheet);
+			if(entity.getFactsheet() != null){
+				DefaultOnlineResource factsheet = new DefaultOnlineResource();
+				factsheet.setLinkage(new URI(entity.getFactsheet()));
+				factsheet.setProtocol("WWW:LINK-1.0-http--link");
+				factsheet.setDescription(new SimpleInternationalString(
+						"Factsheet - Summary description"));
+				factsheet.setFunction(OnLineFunction.INFORMATION);
+				resources.add(factsheet);
+			}
 
-			// viewer Resource (Species Distribution Map Viewer)
-			// --------------------------------------------
-			DefaultOnlineResource viewerResource = new DefaultOnlineResource();
-			viewerResource.setLinkage(entity.getViewerResource());
-			viewerResource.setProtocol("WWW:LINK-1.0-http--link");
-			viewerResource.setDescription(new SimpleInternationalString(entity
-					.getTemplate().getCollection() + " (GIS Viewer)"));
-			viewerResource.setFunction(OnLineFunction.INFORMATION);
-			resources.add(viewerResource);
-
+			// viewer Resource (if it exists)
+			// -------------------------------
+			if(entity.getViewerIdentifier() != null){
+				DefaultOnlineResource viewerResource = new DefaultOnlineResource();
+				viewerResource.setLinkage(entity.getViewerResource());
+				viewerResource.setProtocol("WWW:LINK-1.0-http--link");
+				viewerResource.setDescription(new SimpleInternationalString(entity
+						.getTemplate().getCollection() + " (GIS Viewer)"));
+				viewerResource.setFunction(OnLineFunction.INFORMATION);
+				resources.add(viewerResource);
+			}
+			
 			// OGC standard data protocols
 			// ===========================
 			// WMS resource
@@ -421,8 +416,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 			// "&styles="+entity.getGisProperties().get(GisProperty.STYLE)));
 			wmsResource.setProtocol("OGC:WMS-1.3.0-http-get-map");
 			wmsResource.setName(entity.getTargetLayerName());
-			wmsResource.setDescription(new SimpleInternationalString(entity
-					.getTemplate().getBaseTitle() + entity.getRefName()));
+			wmsResource.setDescription(new SimpleInternationalString(this.title));
 			resources.add(wmsResource);
 
 			// WFS resource (both GML and SHP)
@@ -507,8 +501,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		citation.setIdentifiers(Arrays.asList(identifier));
 
 		// title
-		citation.setTitle(new SimpleInternationalString(entity.getTemplate()
-				.getBaseTitle() + entity.getRefName()));
+		citation.setTitle(new SimpleInternationalString(this.title));
 		DefaultCitationDate citationDate = new DefaultCitationDate();
 		citationDate.setDate(this.getRevisionDate());
 		citationDate.setDateType(DateType.REVISION);
@@ -551,11 +544,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 
 		// abstract
 		// -------
-		identification.setAbstract(new SimpleInternationalString(entity
-				.getTemplate().getBaseTitle()
-				+ entity.getRefName()
-				+ ". "
-				+ entity.getTemplate().getAbstract()));
+		identification.setAbstract(new SimpleInternationalString(this.title+ ". "+ entity.getTemplate().getAbstract()));
 
 		// purpose
 		// -------

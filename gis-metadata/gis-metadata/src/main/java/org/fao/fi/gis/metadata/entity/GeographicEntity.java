@@ -4,14 +4,14 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import org.fao.fi.gis.metadata.MetadataContentTemplate;
+import org.fao.fi.gis.metadata.template.ContentTemplate;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import com.vividsolutions.jts.geom.Envelope;
 
 public interface GeographicEntity {
 
-	MetadataContentTemplate getTemplate();
+	ContentTemplate getTemplate();
 
 	String getGSBaseURL();
 
@@ -53,6 +53,10 @@ public interface GeographicEntity {
 
 	String getFigisId();
 
-	String getFigisDomain();
+	String getDomainName();
+	
+	String getFactsheet();
+	
+	String getIdentifier();
 
 }

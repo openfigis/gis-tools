@@ -5,10 +5,17 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.metadata.MetadataContentTemplate;
+import org.fao.fi.gis.metadata.template.ContentTemplate;
 
 import com.vividsolutions.jts.geom.Envelope;
 
+/**
+ * GeographicEntityImpl
+ * 
+ * 
+ * @author eblondel
+ *
+ */
 public abstract class GeographicEntityImpl implements GeographicEntity {
 
 	private String gnBaseURL;
@@ -20,7 +27,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private String trgLayerPrefix;
 
 	private String code;
-	private MetadataContentTemplate template;
+	private ContentTemplate template;
 	private String targetLayername;
 	private Map<FeatureTypeProperty, Object> geoproperties;
 	private String figisdomain;
@@ -29,7 +36,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private URI viewerResource;
 	private Map<EntityAddin,String> addins;
  
-	public GeographicEntityImpl(String code, MetadataContentTemplate template,
+	public GeographicEntityImpl(String code, ContentTemplate template,
 			String gsBaseURL, String gnBaseURL, String srcWorkspace,
 			String srcLayer, String srcAttribute, String trgWorkspace,
 			String trgLayerPrefix,
@@ -90,7 +97,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		return this.code;
 	}
 
-	public MetadataContentTemplate getTemplate() {
+	public ContentTemplate getTemplate() {
 		return this.template;
 	}
 
@@ -176,12 +183,14 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		Envelope bbox = this.getBBOX();
 
 		String app = null;
-		if (!this.getFigisDomain().endsWith("s")) {
-			app = this.figisdomain.concat("s");
-		} else {
-			app = this.figisdomain;
-		}
-
+		if(this.getDomainName() != null){
+			if (!this.getDomainName().endsWith("s")) {
+				app = this.figisdomain.concat("s");
+			} else {
+				app = this.figisdomain;
+			}
+		}	
+		
 		String resource = null;
 		if (bbox != null) {
 			resource = "http://www.fao.org/figis/geoserver/factsheets/" + app
@@ -197,7 +206,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		}
 
 		this.viewerResource = null;
-		if (bbox != null) {
+		if (this.getDomainName() != null && bbox != null) {
 			this.viewerResource = new URI(resource);
 		}
 	}
@@ -214,7 +223,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		return this.viewerid;
 	}
 
-	public String getFigisDomain() {
+	public String getDomainName() {
 		return this.figisdomain;
 	}
 
@@ -234,4 +243,11 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		return count;
 	}
 
+	public String getIdentifier(){
+		String id = this.getTemplate().getOrganizationContact().getAcronym().toLowerCase()
+					+ "-"+this.getDomainName()
+					+"-map-"+this.getCode().toLowerCase();
+		return id;
+	}
+	
 }

@@ -59,7 +59,7 @@ public class MetadataPublisher {
 		try {
 
 			final GeographicEntityMetadata metadata = new GeographicEntityMetadata(
-					entity, fileIdentifier, this.revisionDate, this.version);
+					entity, this.revisionDate, this.version);
 
 			// metadata insert configuration
 			GNInsertConfiguration icfg = new GNInsertConfiguration();
@@ -100,13 +100,14 @@ public class MetadataPublisher {
 	 */
 	public void deleteMetadata(String metadataURL) throws Exception {
 		String uuid = metadataURL.split("&id=")[1];
-
+		
 		// get Geonetwork long id
 		Element element = client.get(uuid);
+		System.out.println(element.getValue());
 		Element gnInfo = (Element) element.getChildren().get(
 				element.getChildren().size() - 1);
 		long id = Long.parseLong(gnInfo.getChild("id").getValue());
-
+		
 		// delete
 		client.deleteMetadata(id);
 	}

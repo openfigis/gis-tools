@@ -42,8 +42,7 @@ public class Publisher {
 			String gsBaseURL, String gsUser, String gsPassword,
 			String gnBaseURL, String gnUser, String gnPassword,
 			String srcGSWorkspace, String srcGSLayer, String srcAttribute,
-			String trgGSWorkspace, String trgGSDatastore, String trgGSLayerPrefix,
-			String fcURL
+			String trgGSWorkspace, String trgGSDatastore, String trgGSLayerPrefix
 			
 			) throws MalformedURLException{
 	

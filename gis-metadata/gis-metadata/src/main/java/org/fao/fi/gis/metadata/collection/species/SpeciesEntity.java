@@ -13,7 +13,7 @@ import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
-import org.fao.fi.gis.metadata.template.ContentTemplate;
+import org.fao.fi.gis.metadata.model.content.MetadataContent;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -67,7 +67,7 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 	private Map<EntityProperty, List<String>> properties;
 	private Map<GisProperty, String> gisProperties;
 	
-	public SpeciesEntity(String code, ContentTemplate template,
+	public SpeciesEntity(String code, MetadataContent template,
 						String gsBaseURL, String gnBaseURL,
 						String srcWorkspace, String srcLayer, String srcAttribute,
 						String trgWorkspace, String trgLayerPrefix,

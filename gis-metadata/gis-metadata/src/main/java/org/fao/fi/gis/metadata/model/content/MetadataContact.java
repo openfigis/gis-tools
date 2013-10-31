@@ -1,6 +1,12 @@
-package org.fao.fi.gis.metadata.template;
+package org.fao.fi.gis.metadata.model.content;
 
-public class ContactTemplate {
+/**
+ * Metadata Contact
+ * 
+ * @author eblondel
+ *
+ */
+public class MetadataContact {
 	
 	private String name;
 	private String url;
@@ -15,14 +21,14 @@ public class ContactTemplate {
 	private String mainEmail;
 	private String individualName;
 	private String positionName;
-	private String orgName;
+	private String organizationName;
 	
 	/**
 	 * 
 	 * Default Constructor
 	 * 
 	 */
-	public ContactTemplate(){
+	public MetadataContact(){
 		
 	}
 
@@ -198,14 +204,14 @@ public class ContactTemplate {
 	 * @return the orgName
 	 */
 	public String getOrgName() {
-		return orgName;
+		return organizationName;
 	}
 
 	/**
 	 * @param orgName the orgName to set
 	 */
 	public void setOrgName(String orgName) {
-		this.orgName = orgName;
+		this.organizationName = orgName;
 	}
 	
 }

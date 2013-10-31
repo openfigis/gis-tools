@@ -18,7 +18,8 @@ import java.util.UUID;
 
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
-import org.fao.fi.gis.metadata.template.ContactTemplate;
+import org.fao.fi.gis.metadata.model.content.MetadataContact;
+import org.fao.fi.gis.metadata.model.content.MetadataThesaurus;
 import org.fao.fi.gis.metadata.util.Utils;
 import org.geotoolkit.internal.jaxb.gmx.Anchor;
 import org.geotoolkit.metadata.iso.DefaultIdentifier;
@@ -59,6 +60,7 @@ import org.opengis.metadata.constraint.Restriction;
 import org.opengis.metadata.distribution.DigitalTransferOptions;
 import org.opengis.metadata.identification.CharacterSet;
 import org.opengis.metadata.identification.KeywordType;
+import org.opengis.metadata.identification.TopicCategory;
 import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
@@ -196,7 +198,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		addressORG.setCountry(new SimpleInternationalString(entity.getTemplate().getOrganizationContact().getCountry())); // country
 		contactORG.setAddress(addressORG);
 
-		ORGANIZATION.setContactInfo((Contact) contactORG);
+		ORGANIZATION.setContactInfo(contactORG);
 		ORGANIZATION.setOrganisationName(new SimpleInternationalString(
 				entity.getTemplate().getOrganizationContact().getOrgName()));
 		ORGANIZATION.setRole(Role.OWNER);
@@ -213,7 +215,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		
 		final List<ResponsibleParty> contacts = new ArrayList<ResponsibleParty>();
 		
-		for(ContactTemplate iContact : entity.getTemplate().getIndividualContacts()){
+		for(MetadataContact iContact : entity.getTemplate().getIndividualContacts()){
 		
 			DefaultResponsibleParty rp = new DefaultResponsibleParty();
 			
@@ -263,7 +265,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 				contact.setAddress(address);
 			}
 
-			rp.setContactInfo((Contact) contact);
+			rp.setContactInfo(contact);
 			rp.setIndividualName(iContact.getIndividualName());
 			rp.setOrganisationName(new SimpleInternationalString(iContact.getOrgName()));
 			rp.setPositionName(new SimpleInternationalString(iContact.getPositionName()));
@@ -571,15 +573,15 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		List<DefaultKeywords> keywordsList = new ArrayList<DefaultKeywords>();
 
 		// add general thesaurus
-		for (Entry<String, List<String>> thesaurus : entity.getTemplate()
-				.getThesaurusList().entrySet()) {
+		for (MetadataThesaurus thesaurus : entity.getTemplate()
+				.getThesaurusList()) {
 
 			DefaultKeywords keywords = new DefaultKeywords();
 			keywords.setType(KeywordType.THEME);
 			DefaultCitation kwCitation = new DefaultCitation();
 			DefaultCitationDate kwCitationDate = new DefaultCitationDate();
 
-			if (thesaurus.getKey().matches(INSPIRE_THESAURUS_CITATION)) {
+			if (thesaurus.getName().matches(INSPIRE_THESAURUS_CITATION)) {
 				kwCitationDate.setDate(sdf.parse("2008-06-01"));
 				kwCitationDate.setDateType(DateType.PUBLICATION);
 			} else {
@@ -588,9 +590,9 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 			}
 			kwCitation.setDates(Arrays.asList(kwCitationDate));
 			kwCitation.setTitle(new SimpleInternationalString(thesaurus
-					.getKey()));
+					.getName()));
 			keywords.setThesaurusName(kwCitation);
-			for (String kw : thesaurus.getValue()) {
+			for (String kw : thesaurus.getKeywords()) {
 				keywords.getKeywords().add(new SimpleInternationalString(kw));
 			}
 
@@ -640,7 +642,11 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 
 		// topic category
 		// --------------
-		identification.setTopicCategories(entity.getTemplate().getTopics());
+		List<TopicCategory> categories = new ArrayList<TopicCategory>();
+		for(String cat : entity.getTemplate().getTopicCategories()){
+			categories.add(TopicCategory.valueOf(cat));
+		}
+		identification.setTopicCategories(categories);
 
 		// additional information
 		// ----------------------

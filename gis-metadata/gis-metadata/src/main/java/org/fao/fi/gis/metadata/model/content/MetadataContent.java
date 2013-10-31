@@ -1,13 +1,13 @@
-package org.fao.fi.gis.metadata.template;
+package org.fao.fi.gis.metadata.model.content;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.opengis.metadata.identification.TopicCategory;
+
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.io.xml.StaxDriver;
 
 /**
  * A metadata Content template class
@@ -15,24 +15,25 @@ import org.opengis.metadata.identification.TopicCategory;
  * @author eblondel
  *
  */
-public class ContentTemplate {
+public class MetadataContent {
 
 	private String collection;
 	private String collectionURL;
 	private boolean hasBaseTitle;
-	private String basetitle;
+	private String baseTitle;
 	private String abstractText;
 	private String purpose;
 	private String methodology;
 	private String supplementaryInfo;
 	private String license;
 	private String disclaimer;
-	private Map<String,List<String>> thesaurusList;
-	private Set<TopicCategory> topicsList;
-	private ContactTemplate orgContact;
-	private List<ContactTemplate> individualContacts;
+	private List<MetadataThesaurus> thesaurusList;
+	private List<String> topicCategories;
+	private MetadataContact organizationContact;
+	private List<MetadataContact> individualContacts;
 	
-	public ContentTemplate(){
+	
+	public MetadataContent(){
 	}	
 	
 	public void setCollection(String collection){
@@ -60,11 +61,11 @@ public class ContentTemplate {
 	}
 	
 	public void setBaseTitle(String basetitle){
-		this.basetitle = basetitle;
+		this.baseTitle = basetitle;
 	}
 	
 	public String getBaseTitle(){
-		return this.basetitle;
+		return this.baseTitle;
 	}	
 	
 	public void setAbstract(String abstractText){
@@ -108,26 +109,27 @@ public class ContentTemplate {
 		return this.disclaimer;
 	}
 	
-	public void addThesaurus(String theme, List<String> keywords){
+	public void addMetadataThesaurus(MetadataThesaurus thesaurus){
 		if(this.thesaurusList == null){
-			this.thesaurusList = new HashMap<String, List<String>>();
+			this.thesaurusList = new ArrayList<MetadataThesaurus>();
 		}
-		this.thesaurusList.put(theme, keywords);
+		this.thesaurusList.add(thesaurus);
 	}
 
-	public Map<String,List<String>> getThesaurusList(){
+	public List<MetadataThesaurus> getThesaurusList(){
 		return this.thesaurusList;
 	}
 	
-	public void addTopic(TopicCategory topic){
-		if(this.topicsList == null){
-			this.topicsList = new HashSet<TopicCategory>();
+	public void addTopicCategory(String category){
+		
+		if(this.topicCategories == null){
+			this.topicCategories = new ArrayList<String>();
 		}
-		this.topicsList.add(topic);
+		this.topicCategories.add(category);
 	}
 	
-	public Set<TopicCategory> getTopics(){
-		return this.topicsList;
+	public List<String> getTopicCategories(){
+		return this.topicCategories;
 	}
 	
 	public void setSupplementaryInformation(String info){
@@ -138,24 +140,43 @@ public class ContentTemplate {
 		return this.supplementaryInfo;
 	}
 	
-	public void setOrganizationContact(ContactTemplate contact){
-		this.orgContact = contact;
+	public void setOrganizationContact(MetadataContact contact){
+		this.organizationContact = contact;
 	}
 	
-	public ContactTemplate getOrganizationContact(){
-		return this.orgContact;
+	public MetadataContact getOrganizationContact(){
+		return this.organizationContact;
 	}
 	
-	public void addIndividualContact(ContactTemplate contact){
+	public void addIndividualContact(MetadataContact contact){
 		if(this.individualContacts == null){
-			this.individualContacts = new ArrayList<ContactTemplate>();
+			this.individualContacts = new ArrayList<MetadataContact>();
 		}
 		this.individualContacts.add(contact);
 	}
 	
-	public List<ContactTemplate> getIndividualContacts(){
+	public List<MetadataContact> getIndividualContacts(){
 		return this.individualContacts;
 	}
 	
+	/**
+	 * Parsing from XML
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static MetadataContent fromXML(File file){
+			
+		XStream xstream = new XStream(new StaxDriver());
+		xstream.alias("content", MetadataContent.class);
+		xstream.alias("thesaurus", MetadataThesaurus.class);
+		xstream.alias("contact", MetadataContact.class);
+		xstream.alias("category", TopicCategory.class);
+		
+		MetadataContent content = (MetadataContent) xstream.fromXML(file);
+			
+        return content;
+	}
 }
 

@@ -20,7 +20,7 @@ import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
-import org.fao.fi.gis.metadata.template.ContentTemplate;
+import org.fao.fi.gis.metadata.model.content.MetadataContent;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
@@ -75,7 +75,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	private Map<GisProperty, String> gisProperties;
 	
 	
-	public RfbEntity(String code, ContentTemplate template,
+	public RfbEntity(String code, MetadataContent template,
 			String gsBaseURL, String gnBaseURL, String srcWorkspace,
 			String srcLayer, String srcAttribute, String trgWorkspace,String trgLayerPrefix,
 			Map<FeatureTypeProperty, Object> geoproperties,

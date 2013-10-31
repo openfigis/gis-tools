@@ -5,7 +5,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
-import org.fao.fi.gis.metadata.template.ContentTemplate;
+import org.fao.fi.gis.metadata.model.content.MetadataContent;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -27,7 +27,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private String trgLayerPrefix;
 
 	private String code;
-	private ContentTemplate template;
+	private MetadataContent template;
 	private String targetLayername;
 	private Map<FeatureTypeProperty, Object> geoproperties;
 	private String figisdomain;
@@ -36,7 +36,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private URI viewerResource;
 	private Map<EntityAddin,String> addins;
  
-	public GeographicEntityImpl(String code, ContentTemplate template,
+	public GeographicEntityImpl(String code, MetadataContent template,
 			String gsBaseURL, String gnBaseURL, String srcWorkspace,
 			String srcLayer, String srcAttribute, String trgWorkspace,
 			String trgLayerPrefix,
@@ -97,7 +97,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		return this.code;
 	}
 
-	public ContentTemplate getTemplate() {
+	public MetadataContent getTemplate() {
 		return this.template;
 	}
 

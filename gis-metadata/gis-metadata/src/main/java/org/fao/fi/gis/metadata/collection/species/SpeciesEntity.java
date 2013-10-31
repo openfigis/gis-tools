@@ -14,6 +14,8 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
 import org.fao.fi.gis.metadata.model.content.MetadataContent;
+import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -68,18 +70,13 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 	private Map<GisProperty, String> gisProperties;
 	
 	public SpeciesEntity(String code, MetadataContent template,
-						String gsBaseURL, String gnBaseURL,
-						String srcWorkspace, String srcLayer, String srcAttribute,
-						String trgWorkspace, String trgLayerPrefix,
-						Map<FeatureTypeProperty, Object> geoproperties,
-						Map<EntityAddin,String> addins) throws URISyntaxException{
+						 Map<FeatureTypeProperty, Object> geoproperties, Map<EntityAddin,String> addins,
+						 GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings) throws URISyntaxException{
 		
 		super(code, template,
-			gsBaseURL, gnBaseURL,
-			srcWorkspace, srcLayer, srcAttribute,
-			trgWorkspace, trgLayerPrefix,
-			geoproperties,
-			"species", code+"-"+addins.get(EntityAddin.Habitat), addins);
+				geoproperties, addins,
+				gsSettings, metaSettings,
+				"species", code+"-"+addins.get(EntityAddin.Habitat));
 		
 		this.FLODSpeciesEntity = new FLODSpeciesEntity(code);
 		this.setRefName();

@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.content.MetadataContent;
+import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -37,28 +39,27 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private Map<EntityAddin,String> addins;
  
 	public GeographicEntityImpl(String code, MetadataContent template,
-			String gsBaseURL, String gnBaseURL, String srcWorkspace,
-			String srcLayer, String srcAttribute, String trgWorkspace,
-			String trgLayerPrefix,
-			Map<FeatureTypeProperty, Object> geoproperties, String figisdomain,
-			String vieweridentifier, Map<EntityAddin,String> addins) throws URISyntaxException {
+								Map<FeatureTypeProperty, Object> geoproperties, Map<EntityAddin,String> addins,
+								GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings,
+								String figisdomain, String vieweridentifier) throws URISyntaxException {
 
-		this.gsBaseURL = gsBaseURL;
-		this.gnBaseURL = gnBaseURL;
-		this.srcWorkspace = srcWorkspace;
-		this.srcLayername = srcLayer;
-		this.srcAttribute = srcAttribute;
-		this.trgWorkspace = trgWorkspace;
-		this.trgLayerPrefix = trgLayerPrefix;
+		this.gsBaseURL = gsSettings.getUrl();
+		this.gnBaseURL = metaSettings.getUrl();
+		this.srcWorkspace = gsSettings.getSourceWorkspace();
+		this.srcLayername = gsSettings.getSourceLayer();
+		this.srcAttribute = gsSettings.getSourceAttribute();
+		this.trgWorkspace = gsSettings.getTargetWorkspace();
+		this.trgLayerPrefix = gsSettings.getTargetLayerPrefix();
 
 		this.code = code;
 		this.template = template;
 
 		this.setTargetLayername(trgLayerPrefix);
 		this.geoproperties = geoproperties;
+		this.addins = addins;
 		this.figisdomain = figisdomain;
 		this.viewerid = vieweridentifier;
-		this.addins = addins;
+		
 
 		this.setLayerGraphicOverview();
 		this.setViewerResource();

@@ -29,11 +29,11 @@ public final class Utils {
 		Map<String, Map<EntityAddin,String>> speciesList = new HashMap<String, Map<EntityAddin,String>>();
 		try {
 
-			File fXmlFile = new File(specieslist);
+			URL url = new URL(specieslist);
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-			Document doc = dBuilder.parse(fXmlFile);
+			Document doc = dBuilder.parse(url.openStream());
 			doc.getDocumentElement().normalize();
 
 			NodeList nList = doc.getElementsByTagName("item");

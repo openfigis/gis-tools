@@ -4,6 +4,8 @@ import java.io.File;
 import java.util.EnumSet;
 
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
+import org.fao.fi.gis.metadata.model.settings.PublicationSettings;
 import org.geotoolkit.xml.XML;
 import org.jdom.Element;
 
@@ -27,15 +29,15 @@ public class MetadataPublisher {
 	private String gnBaseURL;
 	GNClient client;
 
-	public MetadataPublisher(String revisionDate, String version,
-			String gnBaseURL, String gnUser, String gnPassword) {
-		this.revisionDate = revisionDate;
-		this.version = version;
+	public MetadataPublisher(MetadataCatalogueSettings catalogueSettings,
+							 PublicationSettings publicationSettings) {
+		this.revisionDate = publicationSettings.getDate();
+		this.version = publicationSettings.getVersion();
 
 		// geonetwork connection
-		this.gnBaseURL = gnBaseURL;
+		this.gnBaseURL = catalogueSettings.getUrl();
 		client = new GNClient(this.gnBaseURL);
-		boolean logged = client.login(gnUser, gnPassword);
+		boolean logged = client.login(catalogueSettings.getUser(), catalogueSettings.getPassword());
 		if (!logged) {
 			throw new RuntimeException("Could not log in");
 		}

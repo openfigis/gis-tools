@@ -21,6 +21,8 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
 import org.fao.fi.gis.metadata.entity.GisProperty;
 import org.fao.fi.gis.metadata.model.content.MetadataContent;
+import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.w3c.dom.Document;
@@ -76,15 +78,14 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	
 	
 	public RfbEntity(String code, MetadataContent template,
-			String gsBaseURL, String gnBaseURL, String srcWorkspace,
-			String srcLayer, String srcAttribute, String trgWorkspace,String trgLayerPrefix,
-			Map<FeatureTypeProperty, Object> geoproperties,
-			Map<EntityAddin,String> addins) throws URISyntaxException, ParserConfigurationException, SAXException, IOException {
-		
-		super(code, template, gsBaseURL, gnBaseURL, srcWorkspace, srcLayer,
-				srcAttribute, trgWorkspace, trgLayerPrefix,
-				geoproperties,
-				"rfb", code, addins);
+			Map<FeatureTypeProperty, Object> geoproperties,Map<EntityAddin, String> addins,
+			GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings) throws URISyntaxException,
+			ParserConfigurationException, SAXException, IOException {
+
+		super(code, template,
+				geoproperties, addins,
+				gsSettings, metaSettings,
+				"rfb", code);
 		
 		this.FLODRfbEntity = new FLODRfbEntity(code);
 		this.setRefName();

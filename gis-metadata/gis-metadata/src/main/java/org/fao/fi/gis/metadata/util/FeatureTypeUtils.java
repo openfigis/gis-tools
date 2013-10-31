@@ -8,6 +8,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fao.fi.gis.data.FeatureTypeProperty;
+import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.w3c.dom.Document;
@@ -18,16 +19,15 @@ import org.w3c.dom.NodeList;
 public final class FeatureTypeUtils {
 
 	/**
-	 * Set the BBOX
 	 * 
-	 * @param gsBaseURL
-	 * @param srcWorkspace
-	 * @param srcLayer
-	 * @param srcAttribute
+	 * @param settings
+	 * @param code
+	 * @param buffer
+	 * @return
 	 */
 	public static Map<FeatureTypeProperty, Object> computeFeatureTypeProperties(
-			String gsBaseURL, String srcWorkspace, String srcLayer,
-			String srcAttribute, String code, double buffer) {
+			GeographicServerSettings settings,
+			String code, double buffer) {
 
 		Map<FeatureTypeProperty, Object> map = null;
 
@@ -48,11 +48,13 @@ public final class FeatureTypeUtils {
 
 		try {
 
-			URL url = new URL(gsBaseURL + "/" + srcWorkspace
+			URL url = new URL(settings.getUrl() + "/" + settings.getSourceWorkspace()
 					+ "/ows?service=wfs&version=1.0.0&request=GetFeature"
-					+ "&typeName=" + srcLayer + "&cql_filter=" + srcAttribute
+					+ "&typeName=" + settings.getSourceLayer() + "&cql_filter=" + settings.getSourceAttribute()
 					+ "='" + code + "'");
 
+			System.out.println(url.toString());
+			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
 					.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();

@@ -21,6 +21,8 @@ import java.util.Map.Entry;
 
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.util.Utils;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -41,13 +43,15 @@ public class DataPublisher {
 
 	public GeoServerRESTReader GSReader;
 	public GeoServerRESTPublisher GSPublisher;
-
+	
 	String srcLayer;
 	String srcAttribute;
 	String trgWorkspace;
 	String trgDatastore;
 	String trgLayerPrefix;
+	
 	String geonetworkBaseURL;
+
 
 	/**
 	 * DataPublisher constructor
@@ -60,27 +64,24 @@ public class DataPublisher {
 	 * @param trgLayerPrefix
 	 * @throws MalformedURLException
 	 */
-	public DataPublisher(String gsBaseURL, String gsUser, String gsPassword,
-			String srcLayer, String srcAttribute, String trgWorkspace,
-			String trgDatastore, String trgLayerPrefix, String gnBaseURL)
+	public DataPublisher(GeographicServerSettings settings, MetadataCatalogueSettings catalogueSettings)
 			throws MalformedURLException {
 
-		this.geoserverBaseURL = gsBaseURL;
-		this.gsUser = gsUser;
-		this.gsPwd = gsPassword;
+		this.geoserverBaseURL = settings.getUrl();
+		this.gsUser = settings.getUser();
+		this.gsPwd = settings.getPassword();
 
-		this.GSReader = new GeoServerRESTReader(geoserverBaseURL, gsUser,
-				gsPassword);
-		this.GSPublisher = new GeoServerRESTPublisher(geoserverBaseURL, gsUser,
-				gsPassword);
+		this.GSReader = new GeoServerRESTReader(geoserverBaseURL, gsUser, gsPwd);
+		this.GSPublisher = new GeoServerRESTPublisher(geoserverBaseURL, gsUser, gsPwd);
 
-		this.srcLayer = srcLayer;
-		this.srcAttribute = srcAttribute;
-		this.trgWorkspace = trgWorkspace;
-		this.trgDatastore = trgDatastore;
-		this.trgLayerPrefix = trgLayerPrefix;
-		this.geonetworkBaseURL = gnBaseURL;
+		this.srcLayer = settings.getSourceLayer();
+		this.srcAttribute = settings.getSourceAttribute();
+		this.trgWorkspace = settings.getTargetWorkspace();
+		this.trgDatastore = settings.getTargetDatastore();
+		this.trgLayerPrefix = settings.getTargetLayerPrefix();
 
+		this.geonetworkBaseURL = catalogueSettings.getUrl();
+		
 	}
 
 	/**
@@ -155,8 +156,9 @@ public class DataPublisher {
 	 * @param entity
 	 * @param metadataURL
 	 */
-	public boolean publishLayer(GeographicEntity entity, String style,
-			String metadataID) {
+	public boolean publishLayer(GeographicEntity entity,
+								String style,
+								String metadataID) {
 
 		// target geoserver layer
 		String title = null;

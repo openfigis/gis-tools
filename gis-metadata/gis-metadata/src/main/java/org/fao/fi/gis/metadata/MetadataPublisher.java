@@ -8,6 +8,8 @@ import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.model.settings.PublicationSettings;
 import org.geotoolkit.xml.XML;
 import org.jdom.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import it.geosolutions.geonetwork.GNClient;
 import it.geosolutions.geonetwork.util.GNInsertConfiguration;
@@ -22,6 +24,8 @@ import it.geosolutions.geonetwork.util.GNPrivConfiguration;
  * 
  */
 public class MetadataPublisher {
+	
+	private static Logger LOGGER = LoggerFactory.getLogger(MetadataPublisher.class);
 
 	private String revisionDate;
 	private String version;
@@ -29,6 +33,12 @@ public class MetadataPublisher {
 	private String gnBaseURL;
 	GNClient client;
 
+	/**
+	 * Metadata publisher
+	 * 
+	 * @param catalogueSettings
+	 * @param publicationSettings
+	 */
 	public MetadataPublisher(MetadataCatalogueSettings catalogueSettings,
 							 PublicationSettings publicationSettings) {
 		this.revisionDate = publicationSettings.getDate();
@@ -49,9 +59,8 @@ public class MetadataPublisher {
 	 * through a GeographicEntityMetadata class - Geonetwork-manager to publish
 	 * the metadata in the Geonetwork catalogue
 	 * 
-	 * @param alphacode
-	 * @param scientificname
-	 * @param bbox
+	 * @param fileIdentifier
+	 * @param entity
 	 * @return the metadataURL (string)
 	 */
 	public String publishFullMetadata(String fileIdentifier,
@@ -105,7 +114,6 @@ public class MetadataPublisher {
 		
 		// get Geonetwork long id
 		Element element = client.get(uuid);
-		System.out.println(element.getValue());
 		Element gnInfo = (Element) element.getChildren().get(
 				element.getChildren().size() - 1);
 		long id = Long.parseLong(gnInfo.getChild("id").getValue());

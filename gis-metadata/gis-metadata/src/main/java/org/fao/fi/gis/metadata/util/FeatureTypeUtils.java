@@ -7,10 +7,13 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.fao.fi.gis.Publisher;
 import org.fao.fi.gis.data.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,6 +21,8 @@ import org.w3c.dom.NodeList;
 
 public final class FeatureTypeUtils {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(FeatureTypeUtils.class);
+	
 	/**
 	 * 
 	 * @param settings
@@ -52,8 +57,6 @@ public final class FeatureTypeUtils {
 					+ "/ows?service=wfs&version=1.0.0&request=GetFeature"
 					+ "&typeName=" + settings.getSourceLayer() + "&cql_filter=" + settings.getSourceAttribute()
 					+ "='" + code + "'");
-
-			System.out.println(url.toString());
 			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
 					.newInstance();
@@ -64,7 +67,7 @@ public final class FeatureTypeUtils {
 			doc.getDocumentElement().normalize();
 			nList = doc.getElementsByTagName("gml:featureMember");
 			if (nList != null) {
-				System.out.println(nList.getLength() + " features");
+				LOGGER.info(nList.getLength() + " features");
 				if (nList.getLength() > 0) {
 
 					// ADD COUNT
@@ -187,17 +190,12 @@ public final class FeatureTypeUtils {
 						bounds = new ReferencedEnvelope(bboxMinX, bboxMaxX,
 								bboxMinY, bboxMaxY, DefaultGeographicCRS.WGS84);
 						map.put(FeatureTypeProperty.BBOX, bounds);
-
-						System.out.println(bboxMinX);
-						System.out.println(bboxMaxX);
-						System.out.println(bboxMinY);
-						System.out.println(bboxMaxY);
 					}
 				}
 			}
 
 		} catch (Exception e) {
-			System.out.println("error during computation");
+			LOGGER.warn("error during computation - Re-attempt bounding box computation");
 		}
 
 		return map;

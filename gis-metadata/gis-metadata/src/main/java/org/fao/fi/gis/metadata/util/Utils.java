@@ -1,6 +1,5 @@
 package org.fao.fi.gis.metadata.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -37,7 +36,6 @@ public final class Utils {
 			doc.getDocumentElement().normalize();
 
 			NodeList nList = doc.getElementsByTagName("item");
-			System.out.println(nList.getLength() + " items");
 
 			for (int temp = 0; temp < nList.getLength(); temp++) {
 				// for (int temp = 0; temp < 20; temp++) { //test with the first
@@ -145,7 +143,6 @@ public final class Utils {
 				+ "&elementSetName=full" + "&outputSchema=" + Namespaces.GMD
 				+ "&id=" + mdIdentifier;
 
-		System.out.println(metadataURL);
 		return metadataURL;
 	}
 

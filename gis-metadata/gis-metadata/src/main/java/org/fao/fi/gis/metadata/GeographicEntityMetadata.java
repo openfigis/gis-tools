@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import org.fao.fi.gis.Publisher;
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.content.MetadataContact;
@@ -47,7 +48,6 @@ import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
 import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.geotoolkit.util.SimpleInternationalString;
 
-import org.opengis.metadata.citation.Contact;
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.OnlineResource;
@@ -65,6 +65,9 @@ import org.opengis.metadata.maintenance.MaintenanceFrequency;
 import org.opengis.metadata.maintenance.ScopeCode;
 import org.opengis.metadata.spatial.GeometricObjectType;
 import org.opengis.metadata.spatial.TopologyLevel;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
@@ -80,6 +83,8 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class GeographicEntityMetadata extends DefaultMetadata {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(GeographicEntityMetadata.class);
+	
 	private static final String INSPIRE_THESAURUS_CITATION = "GEMET - INSPIRE themes, version 1.0";
 
 	/**

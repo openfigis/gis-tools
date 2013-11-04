@@ -10,6 +10,8 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.fao.fi.gis.metadata.model.settings.Settings;
 import org.fao.fi.gis.metadata.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Data & Metadata Publisher
@@ -19,29 +21,17 @@ import org.fao.fi.gis.metadata.util.Utils;
  */
 public class Publisher {
 	
+	private static Logger LOGGER = LoggerFactory.getLogger(Publisher.class);
+	
 	private Settings settings;
 	DataPublisher dataPublisher;
 	MetadataPublisher metadataPublisher;
 	
+
 	/**
 	 * Publisher
 	 * 
-	 * @param geographicEntityType
-	 * @param revisionDate
-	 * @param version
-	 * @param gsBaseURL
-	 * @param gsUser
-	 * @param gsPassword
-	 * @param gnBaseURL
-	 * @param gnUser
-	 * @param gnPassword
-	 * @param srcGSWorkspace
-	 * @param srcGSLayer
-	 * @param srcAttribute
-	 * @param trgGSWorkspace
-	 * @param trgGSDatastore
-	 * @param trgGSLayerPrefix
-	 * @param fcURL
+	 * @param config
 	 * @throws MalformedURLException
 	 */
 	public Publisher(MetadataConfig config) throws MalformedURLException{
@@ -76,20 +66,13 @@ public class Publisher {
 
 		if (exist) {
 
-			/* === UTILS === */
-			// ***figisid
-			// figislist.put(entity.getAphiaID(),"http://www.fao.org/fishery/species/"+entity.getFigisID());
-
-			// ***create srv metadata record reference
-			// metalist.add("<srv:operatesOn uuidref=\""+metadataId+"\"/>");
-
 			// force data publication
 			if (this.settings.getPublicationSettings().isForceMetadata()) {
 				try {
 					this.getMetadataPublisher().deleteMetadata(
 							Utils.getXMLMetadataURL(this.settings.getMetadataCatalogueSettings().getUrl(), metadataId));
 				} catch (Exception e) {
-					System.out.println("No metadata for id = "+metadataId);
+					LOGGER.warn("No metadata for id = "+metadataId);
 				}
 
 				this.getMetadataPublisher().publishFullMetadata(
@@ -105,7 +88,7 @@ public class Publisher {
 			}
 
 		} else {
-			System.out.println("Publish new layer");
+			LOGGER.info("Publish new layer");
 			this.getMetadataPublisher().publishFullMetadata(metadataId,
 					entity);
 			this.getDataPublisher().publishLayer(entity,
@@ -114,15 +97,17 @@ public class Publisher {
 
 		}
 
-		System.out.println("Sleeping 3 seconds");
-		Thread.sleep(3000);
+		int sleep = 3;
+		Thread.sleep(3*1000);
+		LOGGER.info("Sleeping "+sleep+" seconds");
+		
 	}
 
 	/**
 	 * Method to unpublish
 	 * 
-	 * @param publisher
 	 * @param entity
+	 * @param exist
 	 * @throws Exception
 	 */
 	public void unpublish(GeographicEntity entity, boolean exist) throws Exception {
@@ -143,13 +128,14 @@ public class Publisher {
 				this.getMetadataPublisher().deleteMetadata(
 						Utils.getXMLMetadataURL(this.settings.getMetadataCatalogueSettings().getUrl(), metadataId));
 			} catch (Exception e) {
-				System.out.println("metadata was yet deleted");
+				LOGGER.warn("metadata was yet deleted");
 			}
 
 		}
 
-		System.out.println("Sleeping 2 seconds");
-		Thread.sleep(2000);
+		int sleep = 3;
+		Thread.sleep(3*1000);
+		LOGGER.info("Sleeping "+sleep+" seconds");
 	}
 
 }

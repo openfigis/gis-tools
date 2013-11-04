@@ -24,6 +24,8 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.util.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -35,6 +37,8 @@ import com.vividsolutions.jts.geom.Envelope;
  */
 public class DataPublisher {
 
+	private static Logger LOGGER = LoggerFactory.getLogger(DataPublisher.class);
+	
 	private static final String crs = "GEOGCS[\"WGS 84\", \n  DATUM[\"World Geodetic System 1984\", \n    SPHEROID[\"WGS 84\", 6378137.0, 298.257223563, AUTHORITY[\"EPSG\",\"7030\"]], \n    AUTHORITY[\"EPSG\",\"6326\"]], \n  PRIMEM[\"Greenwich\", 0.0, AUTHORITY[\"EPSG\",\"8901\"]], \n  UNIT[\"degree\", 0.017453292519943295], \n  AXIS[\"Geodetic longitude\", EAST], \n  AXIS[\"Geodetic latitude\", NORTH], \n  AUTHORITY[\"EPSG\",\"4326\"]]";
 
 	String geoserverBaseURL;
@@ -54,14 +58,10 @@ public class DataPublisher {
 
 
 	/**
-	 * DataPublisher constructor
+	 * Data publisher
 	 * 
-	 * @param gsBaseURL
-	 * @param gsUser
-	 * @param gsPassword
-	 * @param srcLayer
-	 * @param trgWorkspace
-	 * @param trgLayerPrefix
+	 * @param settings
+	 * @param catalogueSettings
 	 * @throws MalformedURLException
 	 */
 	public DataPublisher(GeographicServerSettings settings, MetadataCatalogueSettings catalogueSettings)
@@ -87,7 +87,7 @@ public class DataPublisher {
 	/**
 	 * Get related metadata URL (xml)
 	 * 
-	 * @param code
+	 * @param entity
 	 * @return
 	 * @throws Exception
 	 */
@@ -126,7 +126,7 @@ public class DataPublisher {
 	/**
 	 * Delete the layer
 	 * 
-	 * @param alphacode
+	 * @param entity
 	 * @throws Exception
 	 */
 	public boolean deleteLayer(GeographicEntity entity) {
@@ -154,6 +154,7 @@ public class DataPublisher {
 	 * to be me made available through the Geoserver getCapabilities document
 	 * 
 	 * @param entity
+	 * @param style
 	 * @param metadataURL
 	 */
 	public boolean publishLayer(GeographicEntity entity,

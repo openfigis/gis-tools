@@ -1,7 +1,6 @@
 package org.fao.fi.gis.metadata;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -16,7 +15,7 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.fao.fi.gis.metadata.publisher.Publisher;
 import org.fao.fi.gis.metadata.util.FeatureTypeUtils;
-import org.fao.fi.gis.metadata.util.Utils;
+import org.fao.fi.gis.metadata.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +44,7 @@ public class MainApp {
 		
 		//read the 
 		LOGGER.info("(2) Loading the reference list");
-		set = Utils.parseSpeciesList(config.getSettings()
+		set = CollectionUtils.parseSpeciesList(config.getSettings()
 				.getPublicationSettings().getCodelistURL());
 
 		// configure the publisher

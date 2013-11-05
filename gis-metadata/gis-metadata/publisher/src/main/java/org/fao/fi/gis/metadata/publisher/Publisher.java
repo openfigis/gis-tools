@@ -60,7 +60,7 @@ public class Publisher {
 	 */
 	public void publish(GeographicEntity entity, Map<EntityAddin, String> addins, boolean exist) throws Exception {
 
-		String metadataId = entity.getIdentifier();
+		String metadataId = entity.getMetaIdentifier();
 
 		if (exist) {
 
@@ -110,7 +110,7 @@ public class Publisher {
 	 */
 	public void unpublish(GeographicEntity entity, boolean exist) throws Exception {
 
-		String metadataId = entity.getIdentifier();
+		String metadataId = entity.getMetaIdentifier();
 
 		if (this.settings.getPublicationSettings().isUnpublishData()) {
 			if (!exist) {

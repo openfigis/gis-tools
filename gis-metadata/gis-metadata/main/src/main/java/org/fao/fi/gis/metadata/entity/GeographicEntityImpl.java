@@ -30,9 +30,11 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 
 	private String code;
 	private MetadataContent template;
+	private String metaId;
+	
 	private String targetLayername;
 	private Map<FeatureTypeProperty, Object> geoproperties;
-	private String figisdomain;
+	private String domain;
 	private String viewerid;
 	private URI graphicOverview;
 	private URI viewerResource;
@@ -41,7 +43,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	public GeographicEntityImpl(String code, MetadataContent template,
 								Map<FeatureTypeProperty, Object> geoproperties, Map<EntityAddin,String> addins,
 								GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings,
-								String figisdomain, String vieweridentifier) throws URISyntaxException {
+								String domain, String vieweridentifier) throws URISyntaxException {
 
 		this.gsBaseURL = gsSettings.getUrl();
 		this.gnBaseURL = metaSettings.getUrl();
@@ -52,12 +54,13 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		this.trgLayerPrefix = gsSettings.getTargetLayerPrefix();
 
 		this.code = code;
+		this.domain = domain;
 		this.template = template;
-
+		this.setMetaIdentifier(code);
+		
 		this.setTargetLayername(trgLayerPrefix);
 		this.geoproperties = geoproperties;
 		this.addins = addins;
-		this.figisdomain = figisdomain;
 		this.viewerid = vieweridentifier;
 		
 
@@ -122,6 +125,17 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		return this.addins;
 	}
 
+	
+	public String getMetaIdentifier(){
+		return this.metaId;
+	}
+	
+	private void setMetaIdentifier(String code){
+		this.metaId = this.template.getOrganizationContact().getAcronym().toLowerCase() +"-"+
+					  this.domain + "-map-"+
+					  code.toLowerCase();
+	}
+	
 	/**
 	 * Method that will handle the layer graphic overview to be appended to the
 	 * layer metadata as layer preview
@@ -186,16 +200,16 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		String app = null;
 		if(this.getDomainName() != null){
 			if (!this.getDomainName().endsWith("s")) {
-				app = this.figisdomain.concat("s");
+				app = this.domain.concat("s");
 			} else {
-				app = this.figisdomain;
+				app = this.domain;
 			}
 		}	
 		
 		String resource = null;
 		if (bbox != null) {
 			resource = "http://www.fao.org/figis/geoserver/factsheets/" + app
-					+ ".html?" + this.figisdomain + "=" + this.viewerid
+					+ ".html?" + this.domain + "=" + this.viewerid
 					+ "&extent=" + bbox.getMinX() + "," + bbox.getMinY() + ","
 					+ bbox.getMaxX() + "," + bbox.getMaxY() + "&prj=4326"; // for
 																			// now
@@ -225,7 +239,7 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	}
 
 	public String getDomainName() {
-		return this.figisdomain;
+		return this.domain;
 	}
 
 	public Envelope getBBOX() {
@@ -242,13 +256,6 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 			count = (Integer) this.geoproperties.get(FeatureTypeProperty.COUNT);
 		}
 		return count;
-	}
-
-	public String getIdentifier(){
-		String id = this.getTemplate().getOrganizationContact().getAcronym().toLowerCase()
-					+ "-"+this.getDomainName()
-					+"-map-"+this.getCode().toLowerCase();
-		return id;
 	}
 	
 }

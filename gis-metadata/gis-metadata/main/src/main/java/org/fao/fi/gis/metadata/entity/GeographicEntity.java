@@ -57,6 +57,6 @@ public interface GeographicEntity {
 	
 	String getFactsheet();
 	
-	String getIdentifier();
+	String getMetaIdentifier();
 
 }

@@ -124,7 +124,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 													    this.FLODRfbEntity.getName()));
 		
 		properties.put(RfbProperty.FLOD, Arrays.asList(this.FLODRfbEntity.getRfbCodedEntity()));
-		properties.put(SpeciesProperty.FAO, Arrays.asList("fao-rfb-map-"+this.getCode().toLowerCase()));
+		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
 	}
 	
 	public Map<EntityProperty, List<String>> getSpecificProperties() {

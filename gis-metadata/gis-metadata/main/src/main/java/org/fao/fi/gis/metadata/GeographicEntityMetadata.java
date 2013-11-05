@@ -124,7 +124,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		}
 
 		// build the metadata
-		this.setIdentifier(entity.getIdentifier()); // identifier
+		this.setIdentifier(entity.getMetaIdentifier()); // identifier
 		this.setDateStamp(this.lastRevisionDate);
 
 		this.setLocales(Arrays.asList(Locale.ENGLISH)); // Locales

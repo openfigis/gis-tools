@@ -114,7 +114,7 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 													this.FLODSpeciesEntity.getAphiaID(),
 													this.FLODSpeciesEntity.getWormsScientificName()));
 		}
-		properties.put(SpeciesProperty.FAO, Arrays.asList("fao-species-map-"+this.getCode().toLowerCase()));
+		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
 		properties.put(SpeciesProperty.FLOD, Arrays.asList(this.FLODSpeciesEntity.getASFISCodedEntity()));
 		
 	}	

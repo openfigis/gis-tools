@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>gis-metadata</artifactId>
+		<groupId>org.fao.fi.gis</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>org.fao.fi.gis</groupId>
+	<artifactId>gis-metadata-main</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>main</name>
+	<url>http://www.fao.org/fi</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+		<!-- GeoToolKit -->
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-utility</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit.pending</groupId>
+			<artifactId>geotk-filter</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-referencing</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit</groupId>
+			<artifactId>geotk-metadata</artifactId>
+		</dependency>
+
+		<!-- Geotools -->
+		<dependency>
+			<groupId>org.geotools</groupId>
+			<artifactId>gt-main</artifactId>
+		</dependency>
+		
+		<!-- GIS-METADATA modules -->
+		<dependency>
+			<groupId>org.fao.fi.gis</groupId>
+			<artifactId>gis-metadata-model</artifactId>
+		</dependency>
+
+	</dependencies>
+</project>

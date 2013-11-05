@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<artifactId>gis-metadata</artifactId>
+		<groupId>org.fao.fi.gis</groupId>
+		<version>1.0-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>org.fao.fi.gis</groupId>
+	<artifactId>gis-metadata-publisher</artifactId>
+	<version>1.0-SNAPSHOT</version>
+	<name>publisher</name>
+	<url>http://www.fao.org/fi</url>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-simple</artifactId>
+		</dependency>
+
+		<!-- Geoserver manager -->
+		<dependency>
+			<groupId>it.geosolutions</groupId>
+			<artifactId>geoserver-manager</artifactId>
+		</dependency>
+		<!-- Geonetwork manager -->
+		<dependency>
+			<groupId>it.geosolutions</groupId>
+			<artifactId>geonetwork-manager</artifactId>
+		</dependency>
+
+		<!-- GIS-METADATA modules -->
+		<dependency>
+			<groupId>org.fao.fi.gis</groupId>
+			<artifactId>gis-metadata-main</artifactId>
+		</dependency>
+	</dependencies>
+</project>

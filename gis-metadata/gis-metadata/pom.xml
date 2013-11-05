@@ -5,7 +5,7 @@
 	<groupId>org.fao.fi.gis</groupId>
 	<artifactId>gis-metadata</artifactId>
 	<version>1.0-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>pom</packaging>
 
 	<name>gis-metadata</name>
 	<url>http://www.fao.org/fi</url>
@@ -29,83 +29,108 @@
 		<geotoolkit.version>3.21</geotoolkit.version>
 	</properties>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-simple</artifactId>
-			<version>1.5.6</version>
-		</dependency>
-		
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-simple</artifactId>
+				<version>1.5.6</version>
+			</dependency>
 
-		<!-- Geoserver manager -->
-		<dependency>
-			<groupId>it.geosolutions</groupId>
-			<artifactId>geoserver-manager</artifactId>
-			<version>1.6-SNAPSHOT</version>
-		</dependency>
-		<!-- Geonetwork manager -->
-		<dependency>
-			<groupId>it.geosolutions</groupId>
-			<artifactId>geonetwork-manager</artifactId>
-			<version>1.0.0</version>
-		</dependency>
 
-		<!-- GeoToolKit -->
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-utility</artifactId>
-			<version>${geotoolkit.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotoolkit.pending</groupId>
-			<artifactId>geotk-filter</artifactId>
-			<version>${geotoolkit.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-referencing</artifactId>
-			<version>${geotoolkit.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-metadata</artifactId>
-			<version>${geotoolkit.version}</version>
-		</dependency>
+			<!-- Geoserver manager -->
+			<dependency>
+				<groupId>it.geosolutions</groupId>
+				<artifactId>geoserver-manager</artifactId>
+				<version>1.6-SNAPSHOT</version>
+			</dependency>
+			<!-- Geonetwork manager -->
+			<dependency>
+				<groupId>it.geosolutions</groupId>
+				<artifactId>geonetwork-manager</artifactId>
+				<version>1.0.0</version>
+			</dependency>
 
-		<dependency>
-			<groupId>org.geotoolkit.pending</groupId>
-			<artifactId>geotk-xml-feature-catalogue</artifactId>
-			<version>${geotoolkit.version}</version>
-		</dependency>
+			<!-- GeoToolKit -->
+			<dependency>
+				<groupId>org.geotoolkit</groupId>
+				<artifactId>geotk-utility</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotoolkit.pending</groupId>
+				<artifactId>geotk-filter</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotoolkit</groupId>
+				<artifactId>geotk-referencing</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.geotoolkit</groupId>
+				<artifactId>geotk-metadata</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
 
-		<!-- Geotools -->
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId>
-			<version>${geotools.version}</version>
-		</dependency>
-		
-		<!-- JSON google library -->
-		<dependency>
-			<groupId>com.google.code.gson</groupId>
-			<artifactId>gson</artifactId>
-			<version>1.7.1</version>
-		</dependency>
+			<dependency>
+				<groupId>org.geotoolkit.pending</groupId>
+				<artifactId>geotk-xml-feature-catalogue</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
 
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.2</version>
-			<scope>test</scope>
-		</dependency>
-		
-		<!-- XStream -->
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>1.4.5</version>
-		</dependency>
-	</dependencies>
+			<!-- Geotools -->
+			<dependency>
+				<groupId>org.geotools</groupId>
+				<artifactId>gt-main</artifactId>
+				<version>${geotools.version}</version>
+			</dependency>
+
+			<!-- JSON google library -->
+			<dependency>
+				<groupId>com.google.code.gson</groupId>
+				<artifactId>gson</artifactId>
+				<version>1.7.1</version>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>4.8.2</version>
+				<scope>test</scope>
+			</dependency>
+
+			<!-- XStream -->
+			<dependency>
+				<groupId>com.thoughtworks.xstream</groupId>
+				<artifactId>xstream</artifactId>
+				<version>1.4.5</version>
+			</dependency>
+
+			<!-- modules -->
+			<dependency>
+				<groupId>org.fao.fi.gis</groupId>
+				<artifactId>gis-metadata-model</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fao.fi.gis</groupId>
+				<artifactId>gis-metadata-main</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fao.fi.gis</groupId>
+				<artifactId>gis-metadata-publisher</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+			<dependency>
+				<groupId>org.fao.fi.gis</groupId>
+				<artifactId>gis-metadata-collection</artifactId>
+				<version>1.0-SNAPSHOT</version>
+			</dependency>
+			
+		</dependencies>
+	</dependencyManagement>
 
 	<repositories>
 		<repository>
@@ -142,5 +167,12 @@
 		</repository>
 
 	</repositories>
+	
+	<modules>
+		<module>model</module>
+		<module>main</module>
+		<module>publisher</module>
+		<module>collection</module>
+	</modules>
 	  
 </project>

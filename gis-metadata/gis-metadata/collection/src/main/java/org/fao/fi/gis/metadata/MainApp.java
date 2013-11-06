@@ -1,6 +1,7 @@
 package org.fao.fi.gis.metadata;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -40,13 +41,17 @@ public class MainApp {
 
 		//Read the configuration
 		LOGGER.info("(1) Loading the configuration file");
-		MetadataConfig config = MetadataConfig.fromXML(new File(args[0]));
+		MetadataConfig config = MetadataConfig.fromXML(new File("c:/gis/metadata/config/species.xml"));
 		
 		//read the 
 		LOGGER.info("(2) Loading the reference list");
 		set = CollectionUtils.parseSpeciesList(config.getSettings()
 				.getPublicationSettings().getCodelistURL());
-
+		// specific cases (for testing)
+				set.clear();
+				Map<EntityAddin, String> addins = new HashMap<EntityAddin, String>();
+				addins.put(EntityAddin.Habitat, "m");
+				set.put("GRN", addins);
 		// configure the publisher
 		Publisher publisher = new Publisher(config);
 
@@ -100,7 +105,7 @@ public class MainApp {
 											   config.getSettings().getGeographicServerSettings(),
 											   config.getSettings().getMetadataCatalogueSettings());
 					
-					publisher.publish(entity, set.get(code),exist);
+					publisher.publish(entity, exist);
 					size = size + 1;
 					
 					LOGGER.info(size + " published metalayers");

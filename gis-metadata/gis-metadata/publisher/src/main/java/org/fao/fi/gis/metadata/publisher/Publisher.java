@@ -58,40 +58,31 @@ public class Publisher {
 	 * @param entity
 	 * @throws Exception
 	 */
-	public void publish(GeographicEntity entity, Map<EntityAddin, String> addins, boolean exist) throws Exception {
-
-		String metadataId = entity.getMetaIdentifier();
+	public void publish(GeographicEntity entity, boolean exist) throws Exception {
 
 		if (exist) {
 
 			// force data publication
 			if (this.settings.getPublicationSettings().isForceMetadata()) {
 				try {
-					this.getMetadataPublisher().deleteMetadata(
-							Utils.getXMLMetadataURL(this.settings.getMetadataCatalogueSettings().getUrl(), metadataId));
+					this.getMetadataPublisher().deleteMetadata(entity);
 				} catch (Exception e) {
-					LOGGER.warn("No metadata for id = "+metadataId);
+					LOGGER.warn("No metadata for id = "+entity.getMetaIdentifier());
 				}
 
-				this.getMetadataPublisher().publishFullMetadata(
-						metadataId, entity);
+				this.getMetadataPublisher().publishMetadata(entity);
 
 			}
 
 			if (this.settings.getPublicationSettings().isForceData() == true) {
 				this.getDataPublisher().deleteLayer(entity);
-				this.getDataPublisher().publishLayer(entity,
-						addins.get(EntityAddin.Style),
-						metadataId);
+				this.getDataPublisher().publishLayer(entity);
 			}
 
 		} else {
 			LOGGER.info("Publish new layer");
-			this.getMetadataPublisher().publishFullMetadata(metadataId,
-					entity);
-			this.getDataPublisher().publishLayer(entity,
-					addins.get(EntityAddin.Style),
-					metadataId);
+			this.getMetadataPublisher().publishMetadata(entity);
+			this.getDataPublisher().publishLayer(entity);
 
 		}
 
@@ -110,8 +101,6 @@ public class Publisher {
 	 */
 	public void unpublish(GeographicEntity entity, boolean exist) throws Exception {
 
-		String metadataId = entity.getMetaIdentifier();
-
 		if (this.settings.getPublicationSettings().isUnpublishData()) {
 			if (!exist) {
 				this.getDataPublisher().deleteOnlyFeatureType(entity);
@@ -123,8 +112,7 @@ public class Publisher {
 
 		if (this.settings.getPublicationSettings().isUnpublishMetadata()) {
 			try {
-				this.getMetadataPublisher().deleteMetadata(
-						Utils.getXMLMetadataURL(this.settings.getMetadataCatalogueSettings().getUrl(), metadataId));
+				this.getMetadataPublisher().deleteMetadata(entity);
 			} catch (Exception e) {
 				LOGGER.warn("metadata was yet deleted");
 			}

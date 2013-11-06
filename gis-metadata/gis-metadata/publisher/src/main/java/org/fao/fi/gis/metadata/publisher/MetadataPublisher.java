@@ -16,6 +16,10 @@ import it.geosolutions.geonetwork.GNClient;
 import it.geosolutions.geonetwork.util.GNInsertConfiguration;
 import it.geosolutions.geonetwork.util.GNPriv;
 import it.geosolutions.geonetwork.util.GNPrivConfiguration;
+import it.geosolutions.geonetwork.util.GNSearchRequest;
+import it.geosolutions.geonetwork.util.GNSearchResponse;
+import it.geosolutions.geonetwork.util.GNSearchRequest.Config;
+import it.geosolutions.geonetwork.util.GNSearchResponse.GNMetadata;
 
 /**
  * Metadata Publisher Allows to publish ISO 19115/19139 compliant metadata in a
@@ -55,17 +59,12 @@ public class MetadataPublisher {
 	}
 
 	/**
-	 * Method to publish a full metadata compliant with ISO 19115/19139 standard
-	 * The method use 2 main libraries: - GeoToolKit to generate the metadata
-	 * through a GeographicEntityMetadata class - Geonetwork-manager to publish
-	 * the metadata in the Geonetwork catalogue
+	 * Method to publish a metadata
 	 * 
-	 * @param fileIdentifier
 	 * @param entity
-	 * @return the metadataURL (string)
+	 * @return the metadata identifier
 	 */
-	public String publishFullMetadata(String fileIdentifier,
-			GeographicEntity entity) {
+	public String publishMetadata(GeographicEntity entity) {
 
 		String metadataID = null;
 		try {
@@ -104,23 +103,22 @@ public class MetadataPublisher {
 	}
 
 	/**
-	 * Delete a metadata from Geonetwork Use of gCube Geonetwork Caller rather
-	 * than the Geonetwork-manager
+	 * Delete a metadata from Geonetwork
 	 * 
-	 * @param metadataURL
+	 * @param entity
 	 * @throws Exception
 	 */
-	public void deleteMetadata(String metadataURL) throws Exception {
-		String uuid = metadataURL.split("&id=")[1];
+	public void deleteMetadata(GeographicEntity entity) throws Exception {
 		
-		// get Geonetwork long id
-		Element element = client.get(uuid);
-		Element gnInfo = (Element) element.getChildren().get(
-				element.getChildren().size() - 1);
-		long id = Long.parseLong(gnInfo.getChild("id").getValue());
+		//configure metadata search 
+		GNSearchRequest request = new GNSearchRequest();
+		request.addConfig(Config.similarity, "1");
+		request.addParam("uuid", entity.getMetaIdentifier());
+		GNSearchResponse response = client.search(request);
+		GNMetadata metadata = response.getMetadata(0);
 		
 		// delete
-		client.deleteMetadata(id);
+		client.deleteMetadata(metadata.getId());
 	}
 
 }

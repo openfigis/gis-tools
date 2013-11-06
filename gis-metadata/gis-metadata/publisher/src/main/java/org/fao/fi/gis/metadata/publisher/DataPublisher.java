@@ -21,6 +21,7 @@ import java.util.Map.Entry;
 
 import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.entity.GisProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.util.Utils;
@@ -149,17 +150,11 @@ public class DataPublisher {
 	}
 
 	/**
-	 * A method to publish the Species Distribution layer (per species) as
-	 * Geoserver SQL View layer. The publication also publish the MetadataURL,
-	 * to be me made available through the Geoserver getCapabilities document
+	 * Publish a layer (as GeoServer SQL View layer)
 	 * 
 	 * @param entity
-	 * @param style
-	 * @param metadataURL
 	 */
-	public boolean publishLayer(GeographicEntity entity,
-								String style,
-								String metadataID) {
+	public boolean publishLayer(GeographicEntity entity) {
 
 		// target geoserver layer
 		String title = null;
@@ -218,16 +213,16 @@ public class DataPublisher {
 		// metadata
 		final GSMetadataLinkInfoEncoder mde1 = new GSMetadataLinkInfoEncoder(
 				"text/xml", "ISO19115:2003", Utils.getXMLMetadataURL(
-						this.geonetworkBaseURL, metadataID));
+						this.geonetworkBaseURL, entity.getMetaIdentifier()));
 		final GSMetadataLinkInfoEncoder mde2 = new GSMetadataLinkInfoEncoder(
 				"text/html", "ISO19115:2003", Utils.getHTMLMetadataURL(
-						this.geonetworkBaseURL, metadataID));
+						this.geonetworkBaseURL, entity.getMetaIdentifier()));
 		fte.addMetadataLinkInfo(mde1);
 		fte.addMetadataLinkInfo(mde2);
 
 		// layer
 		final GSLayerEncoder layerEncoder = new GSLayerEncoder21();
-		layerEncoder.setDefaultStyle(style);
+		layerEncoder.setDefaultStyle(entity.getGisProperties().get(GisProperty.STYLE));
 
 		// add authorityURL & identifiers
 		for (Entry<EntityProperty, List<String>> entry : entity

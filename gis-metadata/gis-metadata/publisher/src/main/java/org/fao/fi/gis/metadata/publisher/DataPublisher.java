@@ -85,28 +85,6 @@ public class DataPublisher {
 		
 	}
 
-	/**
-	 * Get related metadata URL (xml)
-	 * 
-	 * @param entity
-	 * @return
-	 * @throws Exception
-	 */
-	public String getRelatedMetadataURL(GeographicEntity entity) {
-
-		String layername = entity.getTargetLayerName();
-
-		// using geoserver-manager
-		String metadataURL = null;
-		List<GSMetadataLinkInfoEncoder> metadataLinks = GSReader.getResource(
-				GSReader.getLayer(layername)).getEncodedMetadataLinkInfoList();
-		for (GSMetadataLinkInfoEncoder metadatalink : metadataLinks) {
-			if (metadatalink.getType().equals("text/xml")) {
-				metadataURL = metadatalink.getContent();
-			}
-		}
-		return metadataURL;
-	}
 
 	/**
 	 * Check layer existence

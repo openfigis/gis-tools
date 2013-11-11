@@ -119,6 +119,14 @@ public class MainApp {
 				
 			} else{
 				
+				// calculate geoproperties
+				while (geoproperties == null) {
+					geoproperties = FeatureTypeUtils
+							.computeFeatureTypeProperties(config.getSettings().getGeographicServerSettings(),
+														code, config.getSettings().getPublicationSettings().getBuffer());
+				}
+				
+				//configure entity
 				if(collectionType.matches("species")){
 					if (flodResponse != null) {
 						entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
@@ -140,13 +148,6 @@ public class MainApp {
 								   config.getSettings().getMetadataCatalogueSettings());
 					}
 					
-				}
-				
-				// calculate geoproperties
-				while (geoproperties == null) {
-					geoproperties = FeatureTypeUtils
-							.computeFeatureTypeProperties(config.getSettings().getGeographicServerSettings(),
-														code, config.getSettings().getPublicationSettings().getBuffer());
 				}
 				
 				// PUBLISH ACTION

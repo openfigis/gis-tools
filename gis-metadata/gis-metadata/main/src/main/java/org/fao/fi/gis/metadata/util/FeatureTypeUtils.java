@@ -189,6 +189,11 @@ public final class FeatureTypeUtils {
 						bounds = new ReferencedEnvelope(bboxMinX, bboxMaxX,
 								bboxMinY, bboxMaxY, DefaultGeographicCRS.WGS84);
 						map.put(FeatureTypeProperty.BBOX, bounds);
+						LOGGER.info("Calculated Bounding Box");
+						LOGGER.info("min X = "+String.valueOf(bboxMinX));
+						LOGGER.info("max X = "+String.valueOf(bboxMaxX));
+						LOGGER.info("min Y = "+String.valueOf(bboxMinY));
+						LOGGER.info("max Y = "+String.valueOf(bboxMaxY));
 					}
 				}
 			}

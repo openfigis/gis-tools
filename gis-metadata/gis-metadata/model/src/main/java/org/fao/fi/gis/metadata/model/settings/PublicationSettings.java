@@ -26,6 +26,7 @@ public class PublicationSettings{
 	private String date;
 	private String version;
 	private double buffer;
+	private boolean test;
 
 	/**
 	 * Constructor
@@ -196,6 +197,22 @@ public class PublicationSettings{
 	}
 	
 	
+	/**
+	 * @return the test
+	 */
+	public boolean isTest() {
+		return test;
+	}
+
+
+	/**
+	 * @param test the test to set
+	 */
+	public void setTest(boolean test) {
+		this.test = test;
+	}
+
+
 	/**
 	 * Parsing from XML
 	 * 

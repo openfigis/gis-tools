@@ -70,6 +70,7 @@ public class SettingsTest {
 		Assert.assertEquals("2013-10-31", publication.getDate());
 		Assert.assertEquals("1.0", publication.getVersion());
 		Assert.assertEquals(2, publication.getBuffer(), 0);
+		Assert.assertTrue(publication.isTest());
 
 	}
 	

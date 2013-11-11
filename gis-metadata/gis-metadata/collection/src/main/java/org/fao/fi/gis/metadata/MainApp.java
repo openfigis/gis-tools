@@ -49,7 +49,7 @@ public class MainApp {
 		LOGGER.info("(1) Loading the configuration file");
 		MetadataConfig config = MetadataConfig.fromXML(new File(args[0]));
 		
-		//read the 
+		//read the codelists
 		LOGGER.info("(2) Loading the reference list");
 		String collectionType = config.getSettings().getPublicationSettings().getCollectionType();
 		LOGGER.info("Collection type = "+collectionType);
@@ -66,6 +66,14 @@ public class MainApp {
 					.getPublicationSettings().getCodelistURL());
 		}
 		
+		//only for test (apply to the first element)
+		if(config.getSettings().getPublicationSettings().isTest()){
+			String testCode = (String) set.keySet().toArray()[0];
+			Map<EntityAddin,String> addin = set.get(testCode);
+			set = new HashMap<String, Map<EntityAddin,String>>();
+			set.put(testCode, addin);
+		}
+			
 		// configure the publisher
 		Publisher publisher = new Publisher(config);
 

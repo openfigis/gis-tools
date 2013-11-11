@@ -30,9 +30,9 @@ import com.google.gson.JsonObject;
  * Main App to launch the batch data/metadata publication
  * 
  */
-public class MainApp {
+public class MetadataGenerator {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(MainApp.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(MetadataGenerator.class);
 
 	static Map<String, Map<EntityAddin, String>> set = null;
 	

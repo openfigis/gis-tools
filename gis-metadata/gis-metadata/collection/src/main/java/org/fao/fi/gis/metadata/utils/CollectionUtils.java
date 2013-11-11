@@ -2,6 +2,7 @@ package org.fao.fi.gis.metadata.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,11 +10,15 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fao.fi.gis.metadata.entity.EntityAddin;
-import org.geotoolkit.xml.Namespaces;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.stream.JsonReader;
 
 public final class CollectionUtils {
 
@@ -114,7 +119,6 @@ public final class CollectionUtils {
 					String style = eElement.getAttribute("style");
 					String fid = eElement.getAttribute("fid");
 					addins.put(EntityAddin.Style, style);
-					addins.put(EntityAddin.FigisID, fid);
 					
 					rfbList.put(rfb, addins);
 
@@ -128,5 +132,49 @@ public final class CollectionUtils {
 
 		return rfbList;
 	}
+	
+	/**
+	 * Method to parse the unique source of EEZs
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, Map<EntityAddin,String>> parseEezList(String file)
+			throws IOException {
+
+		Map<String, Map<EntityAddin,String>> eezList = new HashMap<String, Map<EntityAddin,String>>();
+		
+		JsonReader reader = null;
+		try {
+			// read Json data
+			URL dataURL = new URL(file);
+			reader = new JsonReader(new InputStreamReader(dataURL.openStream()));
+			JsonParser parser = new JsonParser();
+			JsonObject flodJsonObject = parser.parse(reader).getAsJsonObject();
+
+			JsonArray bindings = flodJsonObject.get("results")
+					.getAsJsonObject().get("bindings").getAsJsonArray();
+
+			if (bindings.size() > 0) {
+				for(int i = 0;i<bindings.size();i++){
+					JsonObject obj = bindings.get(i).getAsJsonObject();
+					String mrgid = obj.get("code").getAsJsonObject().get("value").getAsString().split("http://www.fao.org/figis/flod/entities/eezcode/")[1];
+					
+					Map<EntityAddin,String> addins = new HashMap<EntityAddin,String>();
+					addins.put(EntityAddin.Style, "EEZ_HS_style");
+					eezList.put(mrgid, addins);
+				}
+			}
+
+			reader.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return eezList;
+	}
+
 
 }

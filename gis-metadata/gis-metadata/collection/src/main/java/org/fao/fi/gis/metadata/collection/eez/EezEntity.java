@@ -1,18 +1,14 @@
-package org.fao.fi.gis.metadata.collection.rfb;
+package org.fao.fi.gis.metadata.collection.eez;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.fao.fi.gis.metadata.collection.species.SpeciesEntity.SpeciesProperty;
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 import org.fao.fi.gis.metadata.entity.EntityAddin;
@@ -25,32 +21,28 @@ import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 
 /**
- * RFB Entity
+ * EEZ Entity.
+ * Wrapper for EEZ publication by VLIZ.
  * 
  * @author eblondel (FAO)
  *
  */
-public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
+public class EezEntity extends GeographicEntityImpl implements GeographicEntity{
 
-	public enum RfbProperty implements EntityProperty{
+	public enum EezProperty implements EntityProperty{
 		
-		FAO (AuthorityEntity.FAO, true, true),
-		FLOD (AuthorityEntity.FLOD, true, true),
-		
-		FIGIS(AuthorityEntity.FIGIS, true, false);
+		VLIZ (AuthorityEntity.VLIZ, true, true),
+		FLOD (AuthorityEntity.FLOD, true, true);
 		
 		private final AuthorityEntity authority;
 		private final boolean thesaurus;
 		private final boolean containsURIs;
 		
-		RfbProperty(AuthorityEntity authority, boolean thesaurus, boolean containsURIs){
+		EezProperty(AuthorityEntity authority, boolean thesaurus, boolean containsURIs){
 			this.authority = authority;
 			this.thesaurus = thesaurus;
 			this.containsURIs = containsURIs;
@@ -70,36 +62,39 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 		
 	}
 	
-	private FLODRfbEntity FLODRfbEntity;
+	private FLODEezEntity FLODEezEntity;
 	private String refName;
 	private String style;
 	private Map<EntityProperty, List<String>> properties;
 	private Map<GisProperty, String> gisProperties;
 	
 	
-	public RfbEntity(String code, MetadataContent template,
-			Map<FeatureTypeProperty, Object> geoproperties,Map<EntityAddin, String> addins,
-			GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings) throws URISyntaxException,
-			ParserConfigurationException, SAXException, IOException {
-
+	public EezEntity(String code, MetadataContent template,
+			Map<FeatureTypeProperty, Object> geoproperties, Map<EntityAddin,String> addins,
+			GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings
+			) throws URISyntaxException, ParserConfigurationException, SAXException, IOException {
+		
 		super(code, template,
 				geoproperties, addins,
 				gsSettings, metaSettings,
-				"rfb", code);
+				"eez", code);
 		
-		this.FLODRfbEntity = new FLODRfbEntity(code);
+		this.FLODEezEntity = new FLODEezEntity(code);
 		this.setRefName();
 		
 		this.setSpecificProperties();
 		
 		this.style = addins.get(EntityAddin.Style);
 		this.setGisProperties();
-		this.setRfbAbstract();
 	}
 
 	
 	public String getViewerProj() {
-		return "4326";
+		return null;
+	}
+	
+	public String getViewerIdentifier() {
+		return null;
 	}
 
 	public CoordinateReferenceSystem getCRS() {
@@ -107,9 +102,9 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	}
 
 	private void setRefName(){
-		this.refName = this.FLODRfbEntity.getName(); //here we don't want to acronym between parentesis as it is in FIGIS
+		this.refName = this.FLODEezEntity.getName();
 	}
-	
+		
 	/**
 	 * Get the Ref name (name that will be used in metadata title)
 	 * 
@@ -119,20 +114,21 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	}
 
 	public void setSpecificProperties(){
-		properties = new HashMap<EntityProperty, List<String>>();
-		properties.put(RfbProperty.FIGIS, Arrays.asList(this.getCode(),
-													    this.FLODRfbEntity.getName()));
-		
-		properties.put(RfbProperty.FLOD, Arrays.asList(this.FLODRfbEntity.getRfbCodedEntity()));
-		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
+		properties = new HashMap<EntityProperty, List<String>>();		
+		properties.put(EezProperty.FLOD, Arrays.asList(this.FLODEezEntity.getCodedEntity()));
+		properties.put(EezProperty.VLIZ, Arrays.asList(this.getMetaIdentifier()));
 	}
 	
 	public Map<EntityProperty, List<String>> getSpecificProperties() {
 		return this.properties;
 	}
 
+	public String getDomainName(){
+		return "eez";
+	}
+	
 	public String getFigisId() {
-		return this.getCode();
+		return null;
 	}
 	
 	
@@ -149,27 +145,9 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	}
 	
 	public String getFactsheet(){
-		return "http://www.fao.org/fishery/"+this.getDomainName() + "/" + this.getFigisId();
+		return null; //TODO see if there is VLIZ factsheets based on EEZ MRGID 
 	}
 	
-	private void setRfbAbstract() throws ParserConfigurationException, SAXException, IOException{
-		
-		String figisID = this.getAddins().get(EntityAddin.FigisId);
-		
-		System.out.println(figisID);
-		URL fsURL = new URL("http://www.fao.org/fishery/xml/organization/"+figisID);
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-				.newInstance();
-		DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-		Document doc = dBuilder.parse(fsURL.openStream());	
-
-		Element geoCoverage = (Element) doc.getDocumentElement().getElementsByTagName("fi:GeoCoverage").item(0);
-		NodeList nodeList = geoCoverage.getElementsByTagName("fi:Text");
-		if(nodeList.getLength() > 0){
-			String abstractText = nodeList.item(0).getTextContent().replaceAll("<p>", "").replaceAll("</p>", "");
-			this.getTemplate().setAbstract(abstractText);
-		}
 	
-	}
 
 }

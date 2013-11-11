@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fao.fi.gis.metadata.collection.eez.EezEntity;
+import org.fao.fi.gis.metadata.collection.eez.FLODEezEntity;
+import org.fao.fi.gis.metadata.collection.rfb.FLODRfbEntity;
+import org.fao.fi.gis.metadata.collection.rfb.RfbEntity;
 import org.fao.fi.gis.metadata.collection.species.FLODSpeciesEntity;
 import org.fao.fi.gis.metadata.collection.species.SpeciesEntity;
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
@@ -19,6 +23,8 @@ import org.fao.fi.gis.metadata.util.FeatureTypeUtils;
 import org.fao.fi.gis.metadata.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.JsonObject;
 
 /**
  * Main App to launch the batch data/metadata publication
@@ -41,17 +47,25 @@ public class MainApp {
 
 		//Read the configuration
 		LOGGER.info("(1) Loading the configuration file");
-		MetadataConfig config = MetadataConfig.fromXML(new File("c:/gis/metadata/config/species.xml"));
+		MetadataConfig config = MetadataConfig.fromXML(new File(args[0]));
 		
 		//read the 
 		LOGGER.info("(2) Loading the reference list");
-		set = CollectionUtils.parseSpeciesList(config.getSettings()
-				.getPublicationSettings().getCodelistURL());
-		// specific cases (for testing)
-				set.clear();
-				Map<EntityAddin, String> addins = new HashMap<EntityAddin, String>();
-				addins.put(EntityAddin.Habitat, "m");
-				set.put("GRN", addins);
+		String collectionType = config.getSettings().getPublicationSettings().getCollectionType();
+		LOGGER.info("Collection type = "+collectionType);
+		if(collectionType.matches("species")){
+			set = CollectionUtils.parseSpeciesList(config.getSettings()
+					.getPublicationSettings().getCodelistURL());
+			
+		}else if(collectionType.matches("eez")){
+			set = CollectionUtils.parseEezList(config.getSettings()
+					.getPublicationSettings().getCodelistURL());
+			
+		}else if(collectionType.matches("rfb")){
+			set = CollectionUtils.parseRfbList(config.getSettings()
+					.getPublicationSettings().getCodelistURL());
+		}
+		
 		// configure the publisher
 		Publisher publisher = new Publisher(config);
 
@@ -80,48 +94,71 @@ public class MainApp {
 			String action = config.getSettings().getPublicationSettings().getAction();
 			LOGGER.info("== ACTION: "+action+" == ");
 			
+			//configure FLOD entity
+			JsonObject flodResponse = null;
+			if(collectionType.matches("species")){
+				FLODSpeciesEntity flodEntity = new FLODSpeciesEntity(code);
+				flodResponse = flodEntity.getFlodContent();
+				
+			}else if(collectionType.matches("eez")){
+				FLODEezEntity flodEntity = new FLODEezEntity(code);
+				flodResponse = flodEntity.getFlodContent();
+				
+			}else if(collectionType.matches("rfb")){
+				FLODRfbEntity flodEntity = new FLODRfbEntity(code);
+				flodResponse = flodEntity.getFlodContent();
+			}
+			
 			//CHECK ACTION
 			if (action.matches("CHECK")) {	
 				if (!exist) {
-					FLODSpeciesEntity flodEntity = new FLODSpeciesEntity(code);
-					if (flodEntity.getFlodContent() != null) {
+					if (flodResponse != null) {
 						metalist.add(code);
 					}
 				}
 				
-			// PUBLISH ACTION
-			} else if (action.matches("PUBLISH")) {
-		
+			} else{
+				
+				if(collectionType.matches("species")){
+					if (flodResponse != null) {
+						entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
+								   config.getSettings().getGeographicServerSettings(),
+								   config.getSettings().getMetadataCatalogueSettings());
+					}
+					
+				}else if(collectionType.matches("eez")){
+					if (flodResponse != null) {
+						entity = new EezEntity(code, config.getContent(), geoproperties, set.get(code),
+								   config.getSettings().getGeographicServerSettings(),
+								   config.getSettings().getMetadataCatalogueSettings());
+					}
+					
+				}else if(collectionType.matches("rfb")){
+					if (flodResponse != null) {
+						entity = new RfbEntity(code, config.getContent(), geoproperties, set.get(code),
+								   config.getSettings().getGeographicServerSettings(),
+								   config.getSettings().getMetadataCatalogueSettings());
+					}
+					
+				}
+				
 				// calculate geoproperties
 				while (geoproperties == null) {
 					geoproperties = FeatureTypeUtils
 							.computeFeatureTypeProperties(config.getSettings().getGeographicServerSettings(),
 														code, config.getSettings().getPublicationSettings().getBuffer());
 				}
-				// configure entity & publish
-				FLODSpeciesEntity flodEntity = new FLODSpeciesEntity(code);
-				if (flodEntity.getFlodContent() != null) {
-					entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
-											   config.getSettings().getGeographicServerSettings(),
-											   config.getSettings().getMetadataCatalogueSettings());
-					
+				
+				// PUBLISH ACTION
+				if (action.matches("PUBLISH")) {
 					publisher.publish(entity, exist);
-					size = size + 1;
-					
+					size = size + 1;	
 					LOGGER.info(size + " published metalayers");
+				
+				// UNPUBLISH ACTION
+				}else if (action.matches("UNPUBLISH")) {
+					publisher.unpublish(entity, exist);
 				}
-
-			// UNPUBLISH ACTION
-			} else if (action.matches("UNPUBLISH")) {
-				// configure entity & publish
-				FLODSpeciesEntity flodEntity = new FLODSpeciesEntity(code);
-				if (flodEntity.getFlodContent() != null) {
-					entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
-							   config.getSettings().getGeographicServerSettings(),
-							   config.getSettings().getMetadataCatalogueSettings());
-				}
-			
-				publisher.unpublish(entity, exist);
 			}
 		}
 

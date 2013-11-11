@@ -4,6 +4,6 @@ public enum EntityAddin {
 
 	Habitat,
 	Style,
-	FigisID;
+	FigisId;
 	
 }

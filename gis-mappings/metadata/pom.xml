@@ -22,10 +22,10 @@
 		<artifactId>slf4j-simple</artifactId>
 	</dependency>
 
-	<!-- Geoserver manager -->
+	<!-- JAXB4OGC - see http://www.ogcnetwork.net/jaxb4ogc -->
 	<dependency>
-		<groupId>it.geosolutions</groupId>
-		<artifactId>geoserver-manager</artifactId>
+		<groupId>org.jvnet.ogc</groupId>
+		<artifactId>wms-v_1_3_0-schema</artifactId>
 	</dependency>
 
 	<dependency>

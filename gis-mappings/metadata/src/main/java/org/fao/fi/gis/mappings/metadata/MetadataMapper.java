@@ -2,48 +2,64 @@ package org.fao.fi.gis.mappings.metadata;
 
 import java.net.MalformedURLException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import it.geosolutions.geoserver.rest.GeoServerRESTReader;
-import it.geosolutions.geoserver.rest.decoder.RESTFeatureType;
-import it.geosolutions.geoserver.rest.decoder.RESTLayer;
-import it.geosolutions.geoserver.rest.decoder.RESTLayer21;
-import it.geosolutions.geoserver.rest.decoder.RESTLayerList;
-import it.geosolutions.geoserver.rest.decoder.utils.NameLinkElem;
-import it.geosolutions.geoserver.rest.encoder.identifier.GSIdentifierInfoEncoder;
-import it.geosolutions.geoserver.rest.encoder.metadatalink.GSMetadataLinkInfoEncoder;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.transform.stream.StreamSource;
+
+import net.opengis.wms.v_1_3_0.Identifier;
+import net.opengis.wms.v_1_3_0.Layer;
+import net.opengis.wms.v_1_3_0.MetadataURL;
+import net.opengis.wms.v_1_3_0.WMSCapabilities;
+
 
 /**
  * This class aims to give the 1st business logic to query the mapping between
- * FLOD codedentity URI & GIS OGC metadata URI
+ * FLOD codedentity URI & GIS OGC metadata URI.
  * 
- * At now, it's specific to GeoServer implementation and uses the Java REST
- * client library "geoserver-manager".
+ * @author Emmanuel Blondel <emmanuel.blondel@fao.org><emmanuel.blondel1@gmail.com>
  * 
  */
 public class MetadataMapper {
 
-	private GeoServerRESTReader reader;
+	private String baseUrl;
 	private String workspace;
+	private WMSCapabilities wmsCapabilities;
 
 	/**
 	 * Constructs the Metadata mapper
 	 * 
-	 * @param gsBaseURL
-	 * @param gsUser
-	 * @param gsPwd
+	 * @param baseUrl
 	 * @param ws
+	 * @throws JAXBException 
 	 * @throws MalformedURLException
 	 */
-	public MetadataMapper(String gsBaseURL, String gsUser, String gsPwd,
-			String ws) throws MalformedURLException {
-		this.reader = new GeoServerRESTReader(gsBaseURL, gsUser, gsPwd);
+	public MetadataMapper(String baseUrl, String ws) throws JAXBException{
+		this.baseUrl = baseUrl;
 		this.workspace = ws;
+		this.setUp();
 	}
 
+	private void setUp() throws JAXBException{
+		JAXBContext context = JAXBContext
+				.newInstance("net.opengis.wms.v_1_3_0");
+		Unmarshaller unmarshaller = context.createUnmarshaller();
+		
+		String url = this.baseUrl + "/" + this.workspace
+				+ "/ows?service=WMS&version=1.3.0&request=GetCapabilities";
+
+		JAXBElement<WMSCapabilities> wmsCapabilitiesElement = unmarshaller
+				.unmarshal(new StreamSource(url), WMSCapabilities.class);
+		this.wmsCapabilities = (WMSCapabilities) wmsCapabilitiesElement
+				.getValue();
+	}
+	
+	
 	/**
 	 * Get the mappings between coded entity URI & GIS metadata URI
 	 * 
@@ -52,54 +68,38 @@ public class MetadataMapper {
 	public Map<String, Map<LayerProperty,String>> getMappings(String authority) {
 		Map<String, Map<LayerProperty,String>> results = null;
 
-		RESTLayerList layers = reader.getLayers();
-
-		if (layers != null) {
+		List<Layer> layers = wmsCapabilities.getCapability().getLayer().getLayer();
+		if(layers != null){
 			results = new HashMap<String, Map<LayerProperty,String>>();
-			Iterator<NameLinkElem> it = layers.iterator();
-			while (it.hasNext()) {
-
-				// get the GS layer
-				String layerName = it.next().getName();
-				RESTLayer layer = (RESTLayer21) reader.getLayer(workspace, layerName);
-
-				if (layer != null) {
-
-					String codedEntity = null;
-					
-					// Add both metadataURI & title
-					Map<LayerProperty,String> layerProperties = new HashMap<LayerProperty,String>(); 
-
-					// get FeatureType where properties (keywords, metadata,
-					// etc) are configured
-					RESTFeatureType ft = reader.getFeatureType(layer);
-
-					// get reference codedentity added as authority-based Identifiers
-					List<GSIdentifierInfoEncoder> identifiers = layer.getEncodedIdentifierInfoList();
-					for (GSIdentifierInfoEncoder identifier : identifiers) {
-						if (identifier.getAuthority().matches(authority)) {
-							codedEntity = identifier.getIdentifier();
-
-							// get xml Metadata
-							List<GSMetadataLinkInfoEncoder> metadataList = ft
-									.getEncodedMetadataLinkInfoList();
-							if (metadataList.size() > 0) {
-								for (GSMetadataLinkInfoEncoder metadata : metadataList) {
-									if (metadata.getType().matches("text/xml")) {
-										layerProperties.put(LayerProperty.NAME, ft.getName());
-										layerProperties.put(LayerProperty.TITLE, ft.getTitle());
-										layerProperties.put(LayerProperty.METADATAURL, metadata.getContent());
-										break;
-									}
+			for(Layer layer : layers){
+				
+				String codedEntity = null;
+				
+				// Add both metadataURI & title
+				Map<LayerProperty,String> layerProperties = new HashMap<LayerProperty,String>(); 
+				
+				// get reference codedentity added as authority-based Identifiers
+				for(Identifier identifier : layer.getIdentifier()){
+					if (identifier.getAuthority().matches(authority)) {
+						codedEntity = identifier.getValue();
+	
+						// get xml Metadata		
+						List<MetadataURL> metadataList = layer.getMetadataURL();
+						if (metadataList.size() > 0) {
+							for(MetadataURL metadata : metadataList){
+								if(metadata.getFormat().matches("text/xml")){
+									layerProperties.put(LayerProperty.NAME, layer.getName());
+									layerProperties.put(LayerProperty.TITLE, layer.getTitle());
+									layerProperties.put(LayerProperty.METADATAURL, metadata.getOnlineResource().getHref());
 								}
 							}
-							break;
 						}
+						break;
 					}
-
-					if (codedEntity != null) {
-						results.put(codedEntity, layerProperties);
-					}
+				}
+				
+				if (codedEntity != null) {
+					results.put(codedEntity, layerProperties);
 				}
 			}
 		}
@@ -111,17 +111,14 @@ public class MetadataMapper {
 	 * Main class
 	 * 
 	 * @param args
-	 * @throws MalformedURLException
+	 * @throws JAXBException 
 	 */
-	public static void main(String[] args) throws MalformedURLException {
+	public static void main(String[] args) throws JAXBException {
 
-		String gsBaseURL = "gsBaseURL";
-		String gsUser = "gsUser";
-		String gsPassword = "gsPwd";
-		String workspace = "ws";
+		String baseUrl = "http://www.fao.org/figis/geoserver";
+		String workspace = "species";
 
-		MetadataMapper mapper = new MetadataMapper(gsBaseURL, gsUser,
-				gsPassword, workspace);
+		MetadataMapper mapper = new MetadataMapper(baseUrl, workspace);
 		Map<String, Map<LayerProperty, String>> results = mapper
 				.getMappings("FLOD");
 

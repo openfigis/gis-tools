@@ -23,13 +23,6 @@
 				<version>1.5.6</version>
 			</dependency>
 		
-			<!-- Geoserver manager -->
-			<dependency>
-				<groupId>it.geosolutions</groupId>
-				<artifactId>geoserver-manager</artifactId>
-				<version>1.6-SNAPSHOT</version>
-			</dependency>
-		
 			<!-- GeoTools -->
 			<dependency>
 				<groupId>org.geotools</groupId>
@@ -50,6 +43,13 @@
 				<artifactId>junit</artifactId>
 				<version>${junit.version}</version>
 				<scope>test</scope>
+			</dependency>
+			
+			<!-- JAXB4OGC - see http://www.ogcnetwork.net/jaxb4ogc -->
+			<dependency>
+				<groupId>org.jvnet.ogc</groupId>
+				<artifactId>wms-v_1_3_0-schema</artifactId>
+				<version>1.0.3</version>
 			</dependency>
 
 		</dependencies>

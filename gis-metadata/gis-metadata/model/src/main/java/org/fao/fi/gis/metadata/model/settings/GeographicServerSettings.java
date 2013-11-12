@@ -24,6 +24,8 @@ public class GeographicServerSettings{
 	private String targetWorkspace;
 	private String targetDatastore;
 	private String targetLayerPrefix;
+	private String baseLayerWorkspace;
+	private String baseLayerName;
 
 	public GeographicServerSettings() {
 	}
@@ -161,6 +163,34 @@ public class GeographicServerSettings{
 	 */
 	public void setTargetLayerPrefix(String targetLayerPrefix) {
 		this.targetLayerPrefix = targetLayerPrefix;
+	}
+
+	/**
+	 * @return the baseLayerWorkspace
+	 */
+	public String getBaseLayerWorkspace() {
+		return baseLayerWorkspace;
+	}
+
+	/**
+	 * @param baseLayerWorkspace the baseLayerWorkspace to set
+	 */
+	public void setBaseLayerWorkspace(String baseLayerWorkspace) {
+		this.baseLayerWorkspace = baseLayerWorkspace;
+	}
+
+	/**
+	 * @return the baseLayerName
+	 */
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	/**
+	 * @param baseLayerName the baseLayerName to set
+	 */
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
 	}
 
 	/**

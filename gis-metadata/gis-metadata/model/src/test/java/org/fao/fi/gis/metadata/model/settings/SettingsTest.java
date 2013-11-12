@@ -41,6 +41,8 @@ public class SettingsTest {
 		Assert.assertEquals("targetWS", server.getTargetWorkspace());
 		Assert.assertEquals("targetDS", server.getTargetDatastore());
 		Assert.assertEquals("someprefix", server.getTargetLayerPrefix());
+		Assert.assertEquals("baselayerWS", server.getBaseLayerWorkspace());
+		Assert.assertEquals("baselayerName", server.getBaseLayerName());
 
 	}
 	

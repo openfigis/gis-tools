@@ -10,6 +10,8 @@
 		<targetWorkspace>targetWS</targetWorkspace>
 		<targetDatastore>targetDS</targetDatastore>
 		<targetLayerPrefix>someprefix</targetLayerPrefix>
+		<baseLayerWorkspace>baselayerWS</baseLayerWorkspace>
+		<baseLayerName>baselayerName</baseLayerName>
 	</geographicServerSettings>
 	
 	<!-- Metadata catalogue settings -->

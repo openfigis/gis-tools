@@ -27,6 +27,8 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 	private String srcAttribute;
 	private String trgWorkspace;
 	private String trgLayerPrefix;
+	private String baseLayerWorkspace;
+	private String baseLayerName;
 
 	private String code;
 	private MetadataContent template;
@@ -52,6 +54,8 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		this.srcAttribute = gsSettings.getSourceAttribute();
 		this.trgWorkspace = gsSettings.getTargetWorkspace();
 		this.trgLayerPrefix = gsSettings.getTargetLayerPrefix();
+		this.baseLayerWorkspace = gsSettings.getBaseLayerWorkspace();
+		this.baseLayerName = gsSettings.getBaseLayerName();
 
 		this.code = code;
 		this.domain = domain;
@@ -95,6 +99,14 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 
 	public String getTRGLayerprefix() {
 		return this.trgLayerPrefix;
+	}
+	
+	public String getBaseLayerWorkspace(){
+		return this.baseLayerWorkspace;
+	}
+	
+	public String getBaseLayerName(){
+		return this.baseLayerName;
 	}
 
 	public String getCode() {
@@ -174,11 +186,12 @@ public abstract class GeographicEntityImpl implements GeographicEntity {
 		}
 
 		// build the layer preview URI
+		String completeBaseLayerName = this.baseLayerWorkspace +":"+this.baseLayerName;
 		String completeLayerName = this.trgWorkspace + ":"
 				+ this.targetLayername;
 		String graphicLink = this.gsBaseURL
 				+ "/wms?service=WMS&version=1.1.0&request=GetMap" + "&layers="
-				+ "fifao:UN_CONTINENT," + completeLayerName + "&bbox=" + minX
+				+ completeBaseLayerName+"," + completeLayerName + "&bbox=" + minX
 				+ "," + minY + "," + maxX + "," + maxY + "&width=" + width
 				+ "&height=" + height + "&srs=EPSG:4326" + // for now only
 															// EPSG:4326 as

@@ -128,45 +128,47 @@ public class MetadataGenerator {
 			} else{
 				
 				// calculate geoproperties
-				while (geoproperties == null) {
-					geoproperties = FeatureTypeUtils
-							.computeFeatureTypeProperties(config.getSettings().getGeographicServerSettings(),
-														code, config.getSettings().getPublicationSettings().getBuffer());
+				if (action.matches("PUBLISH")){
+					while (geoproperties == null) {
+						geoproperties = FeatureTypeUtils
+								.computeFeatureTypeProperties(config.getSettings().getGeographicServerSettings(),
+															code, config.getSettings().getPublicationSettings().getBuffer());
+					}
 				}
-				
+					
 				//configure entity
-				if(collectionType.matches("species")){
-					if (flodResponse != null) {
+				if (flodResponse != null) {
+					if(collectionType.matches("species")){			
 						entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
 								   config.getSettings().getGeographicServerSettings(),
 								   config.getSettings().getMetadataCatalogueSettings());
-					}
-					
-				}else if(collectionType.matches("eez")){
-					if (flodResponse != null) {
+	
+						
+					}else if(collectionType.matches("eez")){
 						entity = new EezEntity(code, config.getContent(), geoproperties, set.get(code),
 								   config.getSettings().getGeographicServerSettings(),
-								   config.getSettings().getMetadataCatalogueSettings());
-					}
-					
-				}else if(collectionType.matches("rfb")){
-					if (flodResponse != null) {
+								   config.getSettings().getMetadataCatalogueSettings());			
+						
+					}else if(collectionType.matches("rfb")){
 						entity = new RfbEntity(code, config.getContent(), geoproperties, set.get(code),
 								   config.getSettings().getGeographicServerSettings(),
 								   config.getSettings().getMetadataCatalogueSettings());
+						
 					}
 					
-				}
-				
-				// PUBLISH ACTION
-				if (action.matches("PUBLISH")) {
-					publisher.publish(entity, exist);
-					size = size + 1;	
-					LOGGER.info(size + " published metalayers");
-				
-				// UNPUBLISH ACTION
-				}else if (action.matches("UNPUBLISH")) {
-					publisher.unpublish(entity, exist);
+					// PUBLISH ACTION
+					if (action.matches("PUBLISH")) {
+						publisher.publish(entity, exist);
+						size = size + 1;	
+						LOGGER.info(size + " published metalayers");
+					
+					// UNPUBLISH ACTION
+					}else if (action.matches("UNPUBLISH")) {
+						publisher.unpublish(entity, exist);
+					}
+					
+				}else{
+					metalist.add(code);
 				}
 			}
 		}

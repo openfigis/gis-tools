@@ -37,13 +37,13 @@
 			<groupId>org.geotoolkit</groupId>
 			<artifactId>geotk-metadata</artifactId>
 		</dependency>
-
-		<!-- Geotools -->
-		<dependency>
-			<groupId>org.geotools</groupId>
-			<artifactId>gt-main</artifactId>
-		</dependency>
 		
+		<!-- JTS -->
+		<dependency>
+			<groupId>com.vividsolutions</groupId>
+			<artifactId>jts</artifactId>
+		</dependency>
+	
 		<!-- GIS-METADATA modules -->
 		<dependency>
 			<groupId>org.fao.fi.gis</groupId>

@@ -25,7 +25,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<geotools.version>10-SNAPSHOT</geotools.version>
 		<geotoolkit.version>3.21</geotoolkit.version>
 	</properties>
 
@@ -78,14 +77,14 @@
 				<artifactId>geotk-xml-feature-catalogue</artifactId>
 				<version>${geotoolkit.version}</version>
 			</dependency>
-
-			<!-- Geotools -->
+			
+			<!-- JTS -->
 			<dependency>
-				<groupId>org.geotools</groupId>
-				<artifactId>gt-main</artifactId>
-				<version>${geotools.version}</version>
+				<groupId>com.vividsolutions</groupId>
+				<artifactId>jts</artifactId>
+				<version>1.12</version>
 			</dependency>
-
+			
 			<!-- JSON google library -->
 			<dependency>
 				<groupId>com.google.code.gson</groupId>

@@ -9,14 +9,14 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 public final class FeatureTypeUtils {
 
@@ -167,7 +167,7 @@ public final class FeatureTypeUtils {
 					// set null if the connection was lost (coords = 0)
 					// the main app will have to recalculate the bbox until
 					// while bbox == null
-					ReferencedEnvelope bounds = null;
+					Envelope bounds = null;
 					if (!(bboxMinX == 0 & bboxMaxX == 0 & bboxMinY == 0 & bboxMaxY == 0)) {
 
 						// apply buffer
@@ -186,8 +186,8 @@ public final class FeatureTypeUtils {
 						}
 
 						// build envelope
-						bounds = new ReferencedEnvelope(bboxMinX, bboxMaxX,
-								bboxMinY, bboxMaxY, DefaultGeographicCRS.WGS84);
+						bounds = new Envelope(bboxMinX, bboxMaxX,
+								bboxMinY, bboxMaxY);
 						map.put(FeatureTypeProperty.BBOX, bounds);
 						LOGGER.info("Calculated Bounding Box");
 						LOGGER.info("min X = "+String.valueOf(bboxMinX));

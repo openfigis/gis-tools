@@ -10,4 +10,6 @@
 	<targetLayerPrefix>someprefix</targetLayerPrefix>
 	<baseLayerWorkspace>baselayerWS</baseLayerWorkspace>
 	<baseLayerName>baselayerName</baseLayerName>
+	<method>SHAPEFILE</method>
+	<shapefileURL>someURL</shapefileURL>
 </GeographicServer>

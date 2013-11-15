@@ -17,6 +17,8 @@
 			<targetLayerPrefix>someprefix</targetLayerPrefix>	<!-- some prefix to use for the target layer names -->
 			<baseLayerWorkspace>baselayerWS</baseLayerWorkspace><!-- workspace of the baselayer to use as graphic overview background -->
 			<baseLayerName>baselayerName</baseLayerName>		<!-- name of the baselayer to use as graphic overview background -->
+			<method>SHAPEFILE</method>							<!-- the method to publish the resource (if SHAPEFILE, all "source" settings will be ignored)-->
+			<shapefileURL>someURL</shapefileURL>				<!-- the url where to find the shapefile -->			
 		</geographicServerSettings>
 
 		<!-- Metadata catalogue settings -->

@@ -26,6 +26,8 @@ public class GeographicServerSettings{
 	private String targetLayerPrefix;
 	private String baseLayerWorkspace;
 	private String baseLayerName;
+	private String method;
+	private String shapefileURL;
 
 	public GeographicServerSettings() {
 	}
@@ -191,6 +193,34 @@ public class GeographicServerSettings{
 	 */
 	public void setBaseLayerName(String baseLayerName) {
 		this.baseLayerName = baseLayerName;
+	}
+
+	/**
+	 * @return the method
+	 */
+	public String getMethod() {
+		return method;
+	}
+
+	/**
+	 * @param method the method to set
+	 */
+	public void setMethod(String method) {
+		this.method = method;
+	}
+
+	/**
+	 * @return the shapefileURL
+	 */
+	public String getShapefileURL() {
+		return shapefileURL;
+	}
+
+	/**
+	 * @param shapefileURL the shapefileURL to set
+	 */
+	public void setShapefileURL(String shapefileURL) {
+		this.shapefileURL = shapefileURL;
 	}
 
 	/**

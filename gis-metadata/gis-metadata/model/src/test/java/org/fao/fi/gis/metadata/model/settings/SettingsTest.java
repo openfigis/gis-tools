@@ -43,6 +43,8 @@ public class SettingsTest {
 		Assert.assertEquals("someprefix", server.getTargetLayerPrefix());
 		Assert.assertEquals("baselayerWS", server.getBaseLayerWorkspace());
 		Assert.assertEquals("baselayerName", server.getBaseLayerName());
+		Assert.assertEquals("SHAPEFILE", server.getMethod());
+		Assert.assertEquals("someURL",server.getShapefileURL());
 
 	}
 	

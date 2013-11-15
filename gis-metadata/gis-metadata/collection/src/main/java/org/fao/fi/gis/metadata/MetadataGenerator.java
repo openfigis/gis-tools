@@ -23,7 +23,6 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.fao.fi.gis.metadata.publisher.Publisher;
 import org.fao.fi.gis.metadata.util.FeatureTypeUtils;
-import org.fao.fi.gis.metadata.util.Utils;
 import org.fao.fi.gis.metadata.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

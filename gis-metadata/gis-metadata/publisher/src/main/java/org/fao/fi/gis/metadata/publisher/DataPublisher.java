@@ -3,6 +3,7 @@ package org.fao.fi.gis.metadata.publisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
+import it.geosolutions.geoserver.rest.GeoServerRESTPublisher.UploadMethod;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder21;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
@@ -13,12 +14,16 @@ import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.GSVirtualTab
 import it.geosolutions.geoserver.rest.encoder.metadata.virtualtable.VTGeometryEncoder;
 import it.geosolutions.geoserver.rest.encoder.metadatalink.GSMetadataLinkInfoEncoder;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.io.FileUtils;
 import org.fao.fi.gis.metadata.association.GeographicMetaObject;
 import org.fao.fi.gis.metadata.association.GeographicMetaObjectProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
@@ -130,24 +135,18 @@ public class DataPublisher {
 	 * Publish a layer (as GeoServer SQL View layer)
 	 * 
 	 * @param object
+	 * @throws IOException 
 	 */
-	public boolean publishLayer(GeographicMetaObject object, String style) {
+	public boolean publishLayer(GeographicMetaObject object, String style, PublicationMethod method, String shapefile) throws IOException {
 
-		// target geoserver layer
-		String title = null;
-		if(object.getTemplate().getHasBaseTitle()){
-			title = object.getTemplate().getBaseTitle() + object.getRefName();
-		}else{
-			title = object.getRefName();
-		}
-
+		
 		// Using geoserver-manager
 		// -----------------------
 		final GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
 		fte.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED);
 		fte.setNativeName(object.getTargetLayerName());
 		fte.setName(object.getTargetLayerName());
-		fte.setTitle(title);
+		fte.setTitle(object.getMetaTitle());
 		fte.setSRS("EPSG:4326");
 		fte.setNativeCRS("EPSG:4326");
 		fte.setEnabled(true);
@@ -177,15 +176,17 @@ public class DataPublisher {
 		}
 
 		// virtual table (sql view)
-		VTGeometryEncoder gte = new VTGeometryEncoder("THE_GEOM",
-				"MultiPolygon", "4326");
-		String sql = "SELECT * FROM " + this.srcLayer + " WHERE "
-				+ this.srcAttribute + " = '" + object.getCode() + "'";
-		GSVirtualTableEncoder vte = new GSVirtualTableEncoder(
-				object.getTargetLayerName(), sql, null, Arrays.asList(gte),
-				null);
-		fte.setMetadataVirtualTable(vte);
-
+		if(method == PublicationMethod.SQLVIEW){
+			VTGeometryEncoder gte = new VTGeometryEncoder("THE_GEOM",
+					"MultiPolygon", "4326");
+			String sql = "SELECT * FROM " + this.srcLayer + " WHERE "
+					+ this.srcAttribute + " = '" + object.getCode() + "'";
+			GSVirtualTableEncoder vte = new GSVirtualTableEncoder(
+					object.getTargetLayerName(), sql, null, Arrays.asList(gte),
+					null);
+			fte.setMetadataVirtualTable(vte);
+		}
+			
 		// metadata
 		final GSMetadataLinkInfoEncoder mde1 = new GSMetadataLinkInfoEncoder(
 				"text/xml", "ISO19115:2003", Utils.getXMLMetadataURL(
@@ -217,8 +218,25 @@ public class DataPublisher {
 		}
 
 		// publication
-		return GSPublisher.publishDBLayer(trgWorkspace, trgDatastore, fte,
-				layerEncoder);
+		boolean publish = false;
+		if(method == PublicationMethod.SQLVIEW){
+			publish = GSPublisher.publishDBLayer(trgWorkspace, trgDatastore, fte, layerEncoder);
+			
+		}else if(method == PublicationMethod.SHAPEFILE){
+			
+			//prepare shapefile
+			URL url = new URL(shapefile);
+			String tDir = System.getProperty("java.io.tmpdir");
+			String inputpath = tDir + "tmp" + ".zip";
+			File file = new File(inputpath);
+			file.deleteOnExit();
+			FileUtils.copyURLToFile(url, file);
+			
+			publish = GSPublisher.publishShp(trgWorkspace, trgDatastore,
+					new NameValuePair[0], object.getTargetLayerName(),
+					UploadMethod.FILE, file.toURI(), fte, layerEncoder);
+		}
+		return publish;
 
 	}
 }

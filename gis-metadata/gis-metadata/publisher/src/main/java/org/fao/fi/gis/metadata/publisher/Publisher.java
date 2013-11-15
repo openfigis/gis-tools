@@ -73,13 +73,21 @@ public class Publisher {
 
 			if (this.settings.getPublicationSettings().isForceData() == true) {
 				this.getDataPublisher().deleteLayer(object);
-				this.getDataPublisher().publishLayer(object, style);
+				this.getDataPublisher().publishLayer(
+						object,
+						style,
+						PublicationMethod.valueOf(this.settings.getGeographicServerSettings().getMethod()),
+						this.settings.getGeographicServerSettings().getShapefileURL());
 			}
 
 		} else {
 			LOGGER.info("Publish new layer");
 			this.getMetadataPublisher().publishMetadata(object);
-			this.getDataPublisher().publishLayer(object,style);
+			this.getDataPublisher().publishLayer(
+					object,
+					style,
+					PublicationMethod.valueOf(this.settings.getGeographicServerSettings().getMethod()),
+					this.settings.getGeographicServerSettings().getShapefileURL());
 
 		}
 

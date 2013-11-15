@@ -132,14 +132,6 @@ public class EezEntity extends GeographicEntityImpl implements GeographicEntity{
 	}
 	
 	
-	private void setGisProperties(){
-		this.gisProperties  = new HashMap<GisProperty,String>();
-		gisProperties.put(GisProperty.STYLE, this.style);
-		gisProperties.put(GisProperty.PROJECTION, "EPSG:4326");
-		
-	}
-	
-	
 	public Map<GisProperty, String> getGisProperties() {
 		return this.gisProperties;
 	}

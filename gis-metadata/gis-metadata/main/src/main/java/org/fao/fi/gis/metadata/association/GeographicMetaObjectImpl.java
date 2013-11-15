@@ -83,8 +83,8 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 		this.setEntities(entities);
 		this.setCode(entities);
 		this.setRefname(entities);
-		this.setMetaIdentifier(entities);
-		this.setMetaTitle(entities);
+		this.setMetaIdentifier();
+		this.setMetaTitle();
 		
 		this.addins = addins;
 		this.setSpecificProperties(entities, objectProperties);
@@ -139,11 +139,28 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 			if(i==0){
 				codes = entities.get(i).getCode();
 			}else{
-				codes = "_x_"+entities.get(i).getCode();
+				codes += "_x_"+entities.get(i).getCode();
 			}
 		}
 		this.code = codes;
 		
+	}
+	
+	/**
+	 * Alternative method
+	 * 
+	 * @param codes
+	 */
+	public void setCode(String[] codes){
+		String refCodes = "";
+		for(int i = 0; i <codes.length;i++){
+			if(i==0){
+				refCodes = codes[i];
+			}else{
+				refCodes += "_x_"+codes[i];
+			}
+		}
+		this.code = refCodes;
 	}
 
 	/**
@@ -162,10 +179,6 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	public void setRefname(List<GeographicEntity> entities){
 		
 		String refName = "";
-		if(this.getTemplate().getHasBaseTitle()){
-			refName += this.getTemplate().getBaseTitle();
-		}
-		
 		if(entities.size() == 1){
 			refName += entities.get(0).getRefName();
 		}else if(entities.size() > 1){
@@ -179,6 +192,24 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 			}
 		}
 		this.refName = refName;
+		
+	}
+	
+	/**
+	 * Alternative method to set names
+	 * 
+	 * @param names
+	 */
+	public void setRefName(String[] names){
+		String refNames = "";
+		for(int i = 0; i <names.length;i++){
+			if(i==0){
+				refNames = names[i];
+			}else{
+				refNames += " | "+names[i];
+			}
+		}
+		this.refName = refNames;
 		
 	}
 	
@@ -196,7 +227,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	 * 
 	 * @param trgLayerPrefix
 	 */
-	private void setTargetLayername(String trgLayerPrefix) {
+	public void setTargetLayername(String trgLayerPrefix) {
 		if (trgLayerPrefix == null | trgLayerPrefix == "") {
 			this.targetLayername = this.getCode();
 		} else {
@@ -226,8 +257,13 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	 * 
 	 * @param entities
 	 */
-	private void setMetaIdentifier(List<GeographicEntity> entities){	
-		this.metaId = Utils.buildMetadataIdentifier(entities, this.getTemplate().getOrganizationContact().getAcronym(), this.collection);
+	public void setMetaIdentifier(){
+		if(entities.size() > 1){
+			this.metaId = Utils.buildMetadataIdentifier(entities, this.getTemplate().getOrganizationContact().getAcronym(), this.collection);
+		}else{
+			this.metaId = Utils.buildMetadataIdentifier(entities.get(0));
+		}
+		
 	}
 
 	
@@ -244,7 +280,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	 * 
 	 * @param entities
 	 */
-	public void setMetaTitle(List<GeographicEntity> entities){
+	public void setMetaTitle(){
 		
 		this.metaTitle = "";
 		if(this.getTemplate().getHasBaseTitle()){
@@ -319,7 +355,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	
 	public Envelope getBBOX() {
 		Envelope bbox = null;
-		if (this.geoproperties != null) {
+		if (this.geoproperties.containsKey(FeatureTypeProperty.BBOX)) {
 			bbox = (Envelope) this.geoproperties.get(FeatureTypeProperty.BBOX);
 		}
 		return bbox;
@@ -327,7 +363,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 
 	public int getFeaturesCount() {
 		Integer count = 0;
-		if (this.geoproperties != null) {
+		if (this.geoproperties.containsKey(FeatureTypeProperty.COUNT)) {
 			count = (Integer) this.geoproperties.get(FeatureTypeProperty.COUNT);
 		}
 		return count;
@@ -336,7 +372,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 
 	public CoordinateReferenceSystem getCRS() {
 		CoordinateReferenceSystem crs = null;
-		if (this.geoproperties != null) {
+		if (!this.geoproperties.containsKey(FeatureTypeProperty.CRS)) {
 			crs = (CoordinateReferenceSystem) this.geoproperties.get(FeatureTypeProperty.CRS);
 		}
 		return crs;
@@ -358,7 +394,7 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	 * @return URI
 	 * @throws URISyntaxException
 	 */
-	private void setLayerGraphicOverview() throws URISyntaxException {
+	public void setLayerGraphicOverview() throws URISyntaxException {
 
 		// compute the image size
 		double minX = -180.0;

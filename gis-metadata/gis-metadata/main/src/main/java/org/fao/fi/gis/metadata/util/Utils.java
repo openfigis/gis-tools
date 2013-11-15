@@ -64,14 +64,17 @@ public final class Utils {
 	 * @return the metadata identifier
 	 */
 	public static String buildMetadataIdentifier(GeographicEntity entity){
-		String metaId = entity.getConfig().getContent().getOrganizationContact().getAcronym().toLowerCase() +"-"+
-				  entity.getConfig().getSettings().getPublicationSettings().getCollectionType().toLowerCase() + "-map-"+
-				  entity.getCode().toLowerCase();
+		String metaId = null;
+		if(entity.getConfig() != null){
+			metaId = entity.getConfig().getContent().getOrganizationContact().getAcronym().toLowerCase() +"-"+
+					  entity.getConfig().getSettings().getPublicationSettings().getCollectionType().toLowerCase() + "-map-"+
+					  entity.getCode().toLowerCase();
+		}
 		return metaId;
 	}
 	
 	/**
-	 * Builds a metadata identifier for an entity
+	 * Builds a metadata identifier for a list of entities
 	 * 
 	 * @param entity
 	 * @return the metadata identifier
@@ -79,10 +82,12 @@ public final class Utils {
 	public static String buildMetadataIdentifier(List<GeographicEntity> entities, String org, String collectionType){
 		String metaId = org.toLowerCase() +"-"+collectionType.toLowerCase() + "-map-";
 		for(int i=0;i<entities.size();i++){
+			GeographicEntity entity = entities.get(i);
+			String ref = entity.getConfig().getSettings().getPublicationSettings().getCollectionType()+"-"+entity.getCode().toLowerCase();
 			if(i==0){
-				metaId += entities.get(i).getCode().toLowerCase();
+				metaId += ref;
 			}else{
-				metaId += "_x_"+entities.get(i).getCode().toLowerCase();
+				metaId += "_x_"+ref;
 			}
 		}
 		return metaId;

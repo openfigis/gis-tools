@@ -212,11 +212,12 @@ public class DataPublisher {
 					for (String identifier : entry.getValue()) {
 						layerEncoder.addIdentifier(new GSIdentifierInfoEncoder(
 								entry.getKey().authority().name(), identifier));
+								LOGGER.debug("add "+entry.getKey().authority().name()+" identifier: "+identifier);
 					}
 				}
 			}
 		}
-
+		
 		// publication
 		boolean publish = false;
 		if(method == PublicationMethod.SQLVIEW){

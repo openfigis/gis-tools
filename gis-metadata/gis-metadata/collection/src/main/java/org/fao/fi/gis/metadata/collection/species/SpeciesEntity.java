@@ -65,8 +65,14 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 		this.FLODSpeciesEntity = new FLODSpeciesEntity(code);
 		this.setRefName(this.FLODSpeciesEntity.getAsfisScientificName());
 		
+		
 		Map<GeographicMetaObjectProperty, List<String>> properties = new HashMap<GeographicMetaObjectProperty, List<String>>();
-		properties.put(SpeciesProperty.HABITAT, Arrays.asList(this.getAddins().get(EntityAddin.Habitat)));
+		String habitat = null;
+		if(addins != null){
+			habitat = this.getAddins().get(EntityAddin.Habitat);
+			properties.put(SpeciesProperty.HABITAT, Arrays.asList(habitat));
+		}
+		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
 		properties.put(SpeciesProperty.FIGIS, Arrays.asList(this.FLODSpeciesEntity.getFigisID()));
 		properties.put(SpeciesProperty.ASFIS, Arrays.asList(this.FLODSpeciesEntity.getAlphacode(),
 															this.FLODSpeciesEntity.getAsfisScientificName(),
@@ -77,13 +83,14 @@ public class SpeciesEntity extends GeographicEntityImpl implements GeographicEnt
 													this.FLODSpeciesEntity.getAphiaID(),
 													this.FLODSpeciesEntity.getWormsScientificName()));
 		}
-		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
 		properties.put(SpeciesProperty.FLOD, Arrays.asList(this.FLODSpeciesEntity.getASFISCodedEntity()));
 		this.setSpecificProperties(properties);
 		
-		this.setFigisDomain("species");
-		this.setFigisId(this.FLODSpeciesEntity.getFigisID());
-		this.setFigisViewerId(code+"-"+this.getAddins().get(EntityAddin.Habitat));
+		if(habitat != null){
+			this.setFigisDomain("species");
+			this.setFigisId(this.FLODSpeciesEntity.getFigisID());
+			this.setFigisViewerId(code+"-"+this.getAddins().get(EntityAddin.Habitat));
+		}
 		
 	}
 

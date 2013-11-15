@@ -77,7 +77,8 @@ public class Publisher {
 						object,
 						style,
 						PublicationMethod.valueOf(this.settings.getGeographicServerSettings().getMethod()),
-						this.settings.getGeographicServerSettings().getShapefileURL());
+						this.settings.getGeographicServerSettings().getShapefileURL()
+						);
 			}
 
 		} else {

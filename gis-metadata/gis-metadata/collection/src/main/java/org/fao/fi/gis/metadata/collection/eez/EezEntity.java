@@ -65,6 +65,7 @@ public class EezEntity extends GeographicEntityImpl implements GeographicEntity{
 		Map<GeographicMetaObjectProperty, List<String>> properties = new HashMap<GeographicMetaObjectProperty, List<String>>();		
 		properties.put(EezProperty.FLOD, Arrays.asList(this.FLODEezEntity.getCodedEntity()));
 		properties.put(EezProperty.VLIZ, Arrays.asList(this.getMetaIdentifier()));
+
 		this.setSpecificProperties(properties);
 		
 	}

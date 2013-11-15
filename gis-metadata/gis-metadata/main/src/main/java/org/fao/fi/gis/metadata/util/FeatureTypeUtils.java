@@ -11,6 +11,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.query.QueryBuilder;
@@ -20,6 +21,7 @@ import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.Name;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.parameter.ParameterValueGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,13 +54,7 @@ public final class FeatureTypeUtils {
 		double bboxMinY = 0;
 		double bboxMaxX = 0;
 		double bboxMaxY = 0;
-
-		// feature max longitude absolute values
-		// (possibly asumes that all polygons are still simple Polygons and not
-		// MultiPolygons)
-		// **USELESS** double negLimitX = -90;
-		// **USELESS** double posLimitX = 90;
-
+		
 		double maxNegX = -180;
 		double maxPosX = 180;
 
@@ -95,8 +91,7 @@ public final class FeatureTypeUtils {
 
 							// coords
 							Element coords = (Element) bbox.getFirstChild();
-							String[] gmlBounds = coords.getTextContent().split(
-									" ");
+							String[] gmlBounds = coords.getTextContent().split(" ");
 
 							String[] min = gmlBounds[0].split(",");
 							String[] max = gmlBounds[1].split(",");
@@ -113,12 +108,6 @@ public final class FeatureTypeUtils {
 								bboxMaxX = maxX;
 								bboxMaxY = maxY;
 
-								// adjust limits with first limit
-								// **USELESS** if(minX > posLimitX) posLimitX =
-								// minX;
-								// **USELESS** if(maxX < negLimitX) negLimitX =
-								// maxX;
-
 							} else {
 								// classic bbox expansion rule
 								if (minX < bboxMinX)
@@ -130,16 +119,8 @@ public final class FeatureTypeUtils {
 								if (maxY > bboxMaxY)
 									bboxMaxY = maxY;
 
-								// adjust for limit spatial distributions
-								// **USELESS** if(maxX > -180 & maxX <
-								// negLimitX) negLimitX = maxX;
-								// **USELESS** if(minX > 90 & minX < posLimitX)
-								// posLimitX = minX;
-
 							}
 
-							// ** new adjustments
-							// assign maxNegX and maxPosX
 							if (maxX > maxNegX & maxX < 0)
 								maxNegX = maxX;
 							if (minX < maxPosX & minX > 0)
@@ -226,7 +207,7 @@ public final class FeatureTypeUtils {
 	 * @throws DataStoreException 
 	 * @throws MalformedURLException 
 	 */
-	public static Map<FeatureTypeProperty, Object> computeFeatureTypeProperties(String url) throws DataStoreException, MalformedURLException {
+	public static Map<FeatureTypeProperty, Object> computeFeatureTypeProperties(String url, double buffer) throws DataStoreException, MalformedURLException {
 	
 		Map<FeatureTypeProperty, Object> map = new HashMap<FeatureTypeProperty, Object>();
 		
@@ -236,10 +217,118 @@ public final class FeatureTypeUtils {
 	    final FeatureStore shpStore = FeatureStoreFinder.open(params);
 		Name pName = shpStore.getNames().iterator().next();
 		FeatureCollection<Feature> pFC = shpStore.createSession(true).getFeatureCollection(QueryBuilder.all(pName));
+		
+		//optimize bbox
+		// bbox coordinates
+		double bboxMinX = 0;
+		double bboxMinY = 0;
+		double bboxMaxX = 0;
+		double bboxMaxY = 0;
+		
+		double maxNegX = -180;
+		double maxPosX = 180;
+		
+		//first bbox calculation
+		Feature f1 = pFC.iterator().next();
+		bboxMinX = f1.getBounds().getMinX();
+		bboxMinY = f1.getBounds().getMinY();
+		bboxMaxX = f1.getBounds().getMaxX();
+		bboxMaxY = f1.getBounds().getMaxY();
+		
+		FeatureIterator<Feature> it = pFC.iterator();
+		try{
+			while(it.hasNext()){
+				Feature f = it.next();
+				BoundingBox env = f.getBounds();
+				
+				double minX = env.getMinX();
+				double minY = env.getMinY();
+				double maxX = env.getMaxX();
+				double maxY = env.getMaxY();
 
+				// classic bbox expansion rule
+				if (minX < bboxMinX)
+					bboxMinX = minX;
+				if (minY < bboxMinY)
+					bboxMinY = minY;
+				if (maxX > bboxMaxX)
+					bboxMaxX = maxX;
+				if (maxY > bboxMaxY)
+					bboxMaxY = maxY;
+
+				if (maxX > maxNegX & maxX < 0)
+					maxNegX = maxX;
+				if (minX < maxPosX & minX > 0)
+					maxPosX = minX;	
+			}
+		}finally{
+			it.close();
+			shpStore.dispose();
+		}
+		
+		// final adjustment
+		// ***************
+		// in case maxNegX & maxPosX unchanged
+		if (maxNegX == -180)
+			maxNegX = -90;
+		if (maxPosX == 180)
+			maxPosX = 90;
+
+		// for date-limit geographic distributions
+		if (maxNegX < -90 & maxPosX > 90) {
+			bboxMinX = maxPosX;
+			bboxMaxX = 360 - Math.abs(maxNegX);
+		}
+
+		// control for globally distributed layers
+		if (bboxMinX < -175.0 && bboxMaxX > 175.0) {
+			bboxMinX = -180.0;
+			bboxMaxX = 180.0;
+			bboxMinY = -90.0;
+			bboxMaxY = 90.0;
+		}
+
+		// control for overlimit latitude
+		if (bboxMinY < -90)
+			bboxMinY = -90;
+		if (bboxMaxY > 90)
+			bboxMaxY = 90;
+
+		// set null if the connection was lost (coords = 0)
+		// the main app will have to recalculate the bbox until
+		// while bbox == null
+		Envelope bounds = null;
+		if (!(bboxMinX == 0 & bboxMaxX == 0 & bboxMinY == 0 & bboxMaxY == 0)) {
+
+			// apply buffer
+			if (!(bboxMinX < -180 + buffer)
+					&& !(bboxMaxX > 180 - buffer)) {
+				bboxMinX = bboxMinX - buffer;
+				bboxMaxX = bboxMaxX + buffer;
+			}
+
+			if (!(bboxMinY < -90 + buffer)) {
+				bboxMinY = bboxMinY - buffer;
+			}
+			if (!(bboxMaxY > 90 - buffer)) {
+				bboxMaxY = bboxMaxY + buffer;
+
+			}
+
+			// build envelope
+			bounds = new Envelope(bboxMinX, bboxMaxX,
+					bboxMinY, bboxMaxY);
+			LOGGER.info("Calculated Bounding Box");
+			LOGGER.info("min X = "+String.valueOf(bboxMinX));
+			LOGGER.info("max X = "+String.valueOf(bboxMaxX));
+			LOGGER.info("min Y = "+String.valueOf(bboxMinY));
+			LOGGER.info("max Y = "+String.valueOf(bboxMaxY));
+
+		}
+		
 		map.put(FeatureTypeProperty.CRS, pFC.getFeatureType().getCoordinateReferenceSystem());
 		map.put(FeatureTypeProperty.COUNT, pFC.size());
-		map.put(FeatureTypeProperty.BBOX, pFC.getEnvelope());
+		map.put(FeatureTypeProperty.BBOX, bounds);
 
 		return map;
 	}

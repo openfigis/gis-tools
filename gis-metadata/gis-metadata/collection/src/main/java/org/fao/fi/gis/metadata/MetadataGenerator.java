@@ -50,7 +50,7 @@ public class MetadataGenerator {
 
 		//Read the configuration
 		LOGGER.info("(1) Loading the configuration file");
-		MetadataConfig config = MetadataConfig.fromXML(new File("c:/gis/metadata/config/species.xml"));
+		MetadataConfig config = MetadataConfig.fromXML(new File(args[0]));
 		
 		//read the codelists
 		LOGGER.info("(2) Loading the reference list");

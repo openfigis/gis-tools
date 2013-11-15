@@ -19,9 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map.Entry;
 
-import org.fao.fi.gis.metadata.entity.EntityProperty;
-import org.fao.fi.gis.metadata.entity.GeographicEntity;
-import org.fao.fi.gis.metadata.entity.GisProperty;
+import org.fao.fi.gis.metadata.association.GeographicMetaObject;
+import org.fao.fi.gis.metadata.association.GeographicMetaObjectProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.util.Utils;
@@ -105,22 +104,22 @@ public class DataPublisher {
 	/**
 	 * Delete the layer
 	 * 
-	 * @param entity
+	 * @param object
 	 * @throws Exception
 	 */
-	public boolean deleteLayer(GeographicEntity entity) {
-		String layername = entity.getTargetLayerName();
+	public boolean deleteLayer(GeographicMetaObject object) {
+		String layername = object.getTargetLayerName();
 
 		// using geoserver-manager
 		return GSPublisher.unpublishFeatureType(trgWorkspace, trgDatastore,
 				layername);
 	}
 
-	public boolean deleteOnlyFeatureType(GeographicEntity entity)
+	public boolean deleteOnlyFeatureType(GeographicMetaObject object)
 			throws MalformedURLException {
 		URL deleteFtUrl = new URL(this.geoserverBaseURL + "/rest/workspaces/"
 				+ this.trgWorkspace + "/datastores/" + this.trgDatastore
-				+ "/featuretypes/" + entity.getTargetLayerName());
+				+ "/featuretypes/" + object.getTargetLayerName());
 
 		boolean ftDeleted = HTTPUtils.delete(deleteFtUrl.toExternalForm(),
 				this.gsUser, this.gsPwd);
@@ -130,30 +129,30 @@ public class DataPublisher {
 	/**
 	 * Publish a layer (as GeoServer SQL View layer)
 	 * 
-	 * @param entity
+	 * @param object
 	 */
-	public boolean publishLayer(GeographicEntity entity) {
+	public boolean publishLayer(GeographicMetaObject object, String style) {
 
 		// target geoserver layer
 		String title = null;
-		if(entity.getTemplate().getHasBaseTitle()){
-			title = entity.getTemplate().getBaseTitle() + entity.getRefName();
+		if(object.getTemplate().getHasBaseTitle()){
+			title = object.getTemplate().getBaseTitle() + object.getRefName();
 		}else{
-			title = entity.getRefName();
+			title = object.getRefName();
 		}
 
 		// Using geoserver-manager
 		// -----------------------
 		final GSFeatureTypeEncoder fte = new GSFeatureTypeEncoder();
 		fte.setProjectionPolicy(ProjectionPolicy.REPROJECT_TO_DECLARED);
-		fte.setNativeName(entity.getTargetLayerName());
-		fte.setName(entity.getTargetLayerName());
+		fte.setNativeName(object.getTargetLayerName());
+		fte.setName(object.getTargetLayerName());
 		fte.setTitle(title);
 		fte.setSRS("EPSG:4326");
 		fte.setNativeCRS("EPSG:4326");
 		fte.setEnabled(true);
 
-		for (Entry<EntityProperty, List<String>> entry : entity
+		for (Entry<GeographicMetaObjectProperty, List<String>> entry : object
 				.getSpecificProperties().entrySet()) {
 			if (entry.getKey().isThesaurus()) {
 				if (!entry.getKey().containsURIs()) {
@@ -166,7 +165,7 @@ public class DataPublisher {
 			}
 		}
 
-		Envelope bbox = entity.getBBOX();
+		Envelope bbox = object.getBBOX();
 		if (bbox != null) {
 			fte.setNativeBoundingBox(bbox.getMinX(), bbox.getMinY(),
 					bbox.getMaxX(), bbox.getMaxY(), "EPSG:4326");
@@ -178,32 +177,31 @@ public class DataPublisher {
 		}
 
 		// virtual table (sql view)
-		//TODO not generic for "THE_GEOM" (uppercase is specific to Oracle)
 		VTGeometryEncoder gte = new VTGeometryEncoder("THE_GEOM",
 				"MultiPolygon", "4326");
 		String sql = "SELECT * FROM " + this.srcLayer + " WHERE "
-				+ this.srcAttribute + " = '" + entity.getCode() + "'";
+				+ this.srcAttribute + " = '" + object.getCode() + "'";
 		GSVirtualTableEncoder vte = new GSVirtualTableEncoder(
-				entity.getTargetLayerName(), sql, null, Arrays.asList(gte),
+				object.getTargetLayerName(), sql, null, Arrays.asList(gte),
 				null);
 		fte.setMetadataVirtualTable(vte);
 
 		// metadata
 		final GSMetadataLinkInfoEncoder mde1 = new GSMetadataLinkInfoEncoder(
 				"text/xml", "ISO19115:2003", Utils.getXMLMetadataURL(
-						this.geonetworkBaseURL, entity.getMetaIdentifier()));
+						this.geonetworkBaseURL, object.getMetaIdentifier()));
 		final GSMetadataLinkInfoEncoder mde2 = new GSMetadataLinkInfoEncoder(
 				"text/html", "ISO19115:2003", Utils.getHTMLMetadataURL(
-						this.geonetworkBaseURL, entity.getMetaIdentifier()));
+						this.geonetworkBaseURL, object.getMetaIdentifier()));
 		fte.addMetadataLinkInfo(mde1);
 		fte.addMetadataLinkInfo(mde2);
 
 		// layer
 		final GSLayerEncoder layerEncoder = new GSLayerEncoder21();
-		layerEncoder.setDefaultStyle(entity.getGisProperties().get(GisProperty.STYLE));
+		layerEncoder.setDefaultStyle(style);
 
 		// add authorityURL & identifiers
-		for (Entry<EntityProperty, List<String>> entry : entity
+		for (Entry<GeographicMetaObjectProperty, List<String>> entry : object
 				.getSpecificProperties().entrySet()) {
 			if (entry.getKey().isThesaurus()) {
 				if (entry.getKey().containsURIs()) {

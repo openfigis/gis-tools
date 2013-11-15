@@ -9,6 +9,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -194,6 +195,8 @@ public final class FeatureTypeUtils {
 						LOGGER.info("max X = "+String.valueOf(bboxMaxX));
 						LOGGER.info("min Y = "+String.valueOf(bboxMinY));
 						LOGGER.info("max Y = "+String.valueOf(bboxMaxY));
+						
+						map.put(FeatureTypeProperty.CRS, DefaultGeographicCRS.WGS84); //TODO in the future we should manage the crs....
 					}
 				}
 			}

@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.EnumSet;
 
 import org.fao.fi.gis.metadata.GeographicEntityMetadata;
-import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.association.GeographicMetaObject;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.model.settings.PublicationSettings;
 import org.geotoolkit.xml.XML;
@@ -61,16 +61,16 @@ public class MetadataPublisher {
 	/**
 	 * Method to publish a metadata
 	 * 
-	 * @param entity
+	 * @param eobject
 	 * @return the metadata identifier
 	 */
-	public String publishMetadata(GeographicEntity entity) {
+	public String publishMetadata(GeographicMetaObject object) {
 
 		String metadataID = null;
 		try {
 
 			final GeographicEntityMetadata metadata = new GeographicEntityMetadata(
-					entity, this.revisionDate, this.version);
+					object, this.revisionDate, this.version);
 
 			// metadata insert configuration
 			GNInsertConfiguration icfg = new GNInsertConfiguration();
@@ -105,15 +105,15 @@ public class MetadataPublisher {
 	/**
 	 * Delete a metadata from Geonetwork
 	 * 
-	 * @param entity
+	 * @param object
 	 * @throws Exception
 	 */
-	public void deleteMetadata(GeographicEntity entity) throws Exception {
+	public void deleteMetadata(GeographicMetaObject object) throws Exception {
 		
 		//configure metadata search 
 		GNSearchRequest request = new GNSearchRequest();
 		request.addConfig(Config.similarity, "1");
-		request.addParam("uuid", entity.getMetaIdentifier());
+		request.addParam("uuid", object.getMetaIdentifier());
 		GNSearchResponse response = client.search(request);
 		GNMetadata metadata = response.getMetadata(0);
 		

@@ -1,6 +1,7 @@
 package org.fao.fi.gis.metadata;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -8,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.fao.fi.gis.metadata.association.GeographicMetaObject;
+import org.fao.fi.gis.metadata.association.GeographicMetaObjectImpl;
 import org.fao.fi.gis.metadata.collection.eez.EezEntity;
 import org.fao.fi.gis.metadata.collection.eez.FLODEezEntity;
 import org.fao.fi.gis.metadata.collection.rfb.FLODRfbEntity;
@@ -20,6 +23,7 @@ import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.fao.fi.gis.metadata.publisher.Publisher;
 import org.fao.fi.gis.metadata.util.FeatureTypeUtils;
+import org.fao.fi.gis.metadata.util.Utils;
 import org.fao.fi.gis.metadata.utils.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +51,7 @@ public class MetadataGenerator {
 
 		//Read the configuration
 		LOGGER.info("(1) Loading the configuration file");
-		MetadataConfig config = MetadataConfig.fromXML(new File(args[0]));
+		MetadataConfig config = MetadataConfig.fromXML(new File("c:/gis/metadata/config/species.xml"));
 		
 		//read the codelists
 		LOGGER.info("(2) Loading the reference list");
@@ -139,32 +143,30 @@ public class MetadataGenerator {
 				//configure entity
 				if (flodResponse != null) {
 					if(collectionType.matches("species")){			
-						entity = new SpeciesEntity(code, config.getContent(), geoproperties, set.get(code),
-								   config.getSettings().getGeographicServerSettings(),
-								   config.getSettings().getMetadataCatalogueSettings());
+						entity = new SpeciesEntity(code, set.get(code), config);
 	
-						
 					}else if(collectionType.matches("eez")){
-						entity = new EezEntity(code, config.getContent(), geoproperties, set.get(code),
-								   config.getSettings().getGeographicServerSettings(),
-								   config.getSettings().getMetadataCatalogueSettings());			
+						entity = new EezEntity(code, set.get(code), config);	
 						
 					}else if(collectionType.matches("rfb")){
-						entity = new RfbEntity(code, config.getContent(), geoproperties, set.get(code),
-								   config.getSettings().getGeographicServerSettings(),
-								   config.getSettings().getMetadataCatalogueSettings());
+						entity = new RfbEntity(code, set.get(code), config);
 						
 					}
 					
+					boolean figis = config.getSettings().getPublicationSettings().isFigis();
+					GeographicMetaObject metaObject = new GeographicMetaObjectImpl(Arrays.asList(entity), geoproperties, null, set.get(code), config);
+					
 					// PUBLISH ACTION
 					if (action.matches("PUBLISH")) {
-						publisher.publish(entity, exist);
+						String style = set.get(code).get(EntityAddin.Style);
+						LOGGER.debug(style);
+						publisher.publish(metaObject, style, exist);
 						size = size + 1;	
 						LOGGER.info(size + " published metalayers");
 					
 					// UNPUBLISH ACTION
 					}else if (action.matches("UNPUBLISH")) {
-						publisher.unpublish(entity, exist);
+						publisher.unpublish(metaObject, exist);
 					}
 					
 				}else{

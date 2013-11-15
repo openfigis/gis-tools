@@ -27,6 +27,7 @@ public class PublicationSettings{
 	private String version;
 	private double buffer;
 	private boolean test;
+	private boolean figis;
 
 	/**
 	 * Constructor
@@ -210,6 +211,22 @@ public class PublicationSettings{
 	 */
 	public void setTest(boolean test) {
 		this.test = test;
+	}
+
+
+	/**
+	 * @return the figis
+	 */
+	public boolean isFigis() {
+		return this.figis;
+	}
+
+
+	/**
+	 * @param figis the fromFigis to set
+	 */
+	public void setFigis(boolean fromFigis) {
+		this.figis = fromFigis;
 	}
 
 

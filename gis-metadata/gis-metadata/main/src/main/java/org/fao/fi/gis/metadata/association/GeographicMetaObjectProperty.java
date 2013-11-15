@@ -1,8 +1,8 @@
-package org.fao.fi.gis.metadata.entity;
+package org.fao.fi.gis.metadata.association;
 
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 
-public interface EntityProperty {
+public interface GeographicMetaObjectProperty {
 
 	AuthorityEntity authority();
 

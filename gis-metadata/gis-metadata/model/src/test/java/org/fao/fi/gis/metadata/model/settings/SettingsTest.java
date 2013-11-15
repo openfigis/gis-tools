@@ -73,6 +73,7 @@ public class SettingsTest {
 		Assert.assertEquals("1.0", publication.getVersion());
 		Assert.assertEquals(2, publication.getBuffer(), 0);
 		Assert.assertTrue(publication.isTest());
+		Assert.assertTrue(publication.isFigis());
 
 	}
 	

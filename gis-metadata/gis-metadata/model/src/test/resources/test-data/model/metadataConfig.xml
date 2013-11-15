@@ -45,6 +45,7 @@
 			<version>1.0</version>
 			<buffer>2</buffer>
 			<test>true</test>
+			<figis>true</figis>
 
 		</publicationSettings>
 

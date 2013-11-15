@@ -45,6 +45,7 @@
 			<version>1.0</version>								<!-- version -->
 			<buffer>2</buffer>									<!-- numeric buffer value (in degrees) to set a geographic buffer for map bounding box -->
 			<test>true</test>									<!-- true will publish only one layer/metadata - TO USE INITIALLY to test the publication -->
+			<figis>true</figis>									<!-- if it is a FIGIS data collection -->
 
 		</publicationSettings>
 

@@ -1,62 +1,37 @@
 package org.fao.fi.gis.metadata.entity;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
-import org.fao.fi.gis.metadata.model.content.MetadataContent;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.fao.fi.gis.metadata.association.GeographicMetaObjectProperty;
+import org.fao.fi.gis.metadata.model.MetadataConfig;
 
-import com.vividsolutions.jts.geom.Envelope;
-
+/**
+ * GeographicEntity interface
+ * 
+ * @author eblondel
+ *
+ */
 public interface GeographicEntity {
 
-	MetadataContent getTemplate();
-
-	String getGSBaseURL();
-
-	String getGNBaseURL();
-
-	String getSRCWorkspace();
-
-	String getSRCLayername();
-
-	String getSRCAttribute();
-
-	String getTRGWorkspace();
-
-	String getTRGLayerprefix();
-
+	//identification
+	
 	String getCode();
 
-	String getTargetLayerName();
-
-	Envelope getBBOX();
-
-	int getFeaturesCount();
-
-	URI getLayerGraphicOverview();
-
-	URI getViewerResource();
-
-	String getViewerIdentifier();
-
-	String getViewerProj();
-
-	CoordinateReferenceSystem getCRS();
-
 	String getRefName();
-
-	Map<EntityProperty, List<String>> getSpecificProperties();
-
-	Map<GisProperty, String> getGisProperties();
-
-	String getFigisId();
-
-	String getDomainName();
-	
-	String getFactsheet();
 	
 	String getMetaIdentifier();
+
+	Map<GeographicMetaObjectProperty, List<String>> getSpecificProperties();
+
+	MetadataConfig getConfig();
+	
+	//specific to FIGIS
+	
+	String getFigisDomain();
+	
+	String getFigisId();
+
+	String getFigisViewerId();
 
 }

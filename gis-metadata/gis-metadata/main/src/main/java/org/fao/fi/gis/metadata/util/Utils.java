@@ -1,19 +1,9 @@
 package org.fao.fi.gis.metadata.util;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import java.util.List;
 
-import org.fao.fi.gis.metadata.entity.EntityAddin;
+import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.geotoolkit.xml.Namespaces;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 public final class Utils {
 
@@ -65,6 +55,37 @@ public final class Utils {
 				+ "&id=" + mdIdentifier;
 
 		return metadataURL;
+	}
+	
+	/**
+	 * Builds a metadata identifier for an entity
+	 * 
+	 * @param entity
+	 * @return the metadata identifier
+	 */
+	public static String buildMetadataIdentifier(GeographicEntity entity){
+		String metaId = entity.getConfig().getContent().getOrganizationContact().getAcronym().toLowerCase() +"-"+
+				  entity.getConfig().getSettings().getPublicationSettings().getCollectionType().toLowerCase() + "-map-"+
+				  entity.getCode().toLowerCase();
+		return metaId;
+	}
+	
+	/**
+	 * Builds a metadata identifier for an entity
+	 * 
+	 * @param entity
+	 * @return the metadata identifier
+	 */
+	public static String buildMetadataIdentifier(List<GeographicEntity> entities, String org, String collectionType){
+		String metaId = org.toLowerCase() +"-"+collectionType.toLowerCase() + "-map-";
+		for(int i=0;i<entities.size();i++){
+			if(i==0){
+				metaId += entities.get(i).getCode().toLowerCase();
+			}else{
+				metaId += "_x_"+entities.get(i).getCode().toLowerCase();
+			}
+		}
+		return metaId;
 	}
 
 }

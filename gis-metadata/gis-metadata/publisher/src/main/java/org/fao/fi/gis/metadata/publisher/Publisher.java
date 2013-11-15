@@ -1,13 +1,9 @@
 package org.fao.fi.gis.metadata.publisher;
 
 import java.net.MalformedURLException;
-import java.util.Map;
-
-import org.fao.fi.gis.metadata.entity.EntityAddin;
-import org.fao.fi.gis.metadata.entity.GeographicEntity;
+import org.fao.fi.gis.metadata.association.GeographicMetaObject;
 import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.fao.fi.gis.metadata.model.settings.Settings;
-import org.fao.fi.gis.metadata.util.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,35 +50,36 @@ public class Publisher {
 	/**
 	 * Method to publish
 	 * 
-	 * @param publisher
-	 * @param entity
+	 * @param object
+	 * @param style
+	 * @param exist
 	 * @throws Exception
 	 */
-	public void publish(GeographicEntity entity, boolean exist) throws Exception {
+	public void publish(GeographicMetaObject object, String style, boolean exist) throws Exception {
 
 		if (exist) {
 
 			// force data publication
 			if (this.settings.getPublicationSettings().isForceMetadata()) {
 				try {
-					this.getMetadataPublisher().deleteMetadata(entity);
+					this.getMetadataPublisher().deleteMetadata(object);
 				} catch (Exception e) {
-					LOGGER.warn("No metadata for id = "+entity.getMetaIdentifier());
+					LOGGER.warn("No metadata for id = "+object.getMetaIdentifier());
 				}
 
-				this.getMetadataPublisher().publishMetadata(entity);
+				this.getMetadataPublisher().publishMetadata(object);
 
 			}
 
 			if (this.settings.getPublicationSettings().isForceData() == true) {
-				this.getDataPublisher().deleteLayer(entity);
-				this.getDataPublisher().publishLayer(entity);
+				this.getDataPublisher().deleteLayer(object);
+				this.getDataPublisher().publishLayer(object, style);
 			}
 
 		} else {
 			LOGGER.info("Publish new layer");
-			this.getMetadataPublisher().publishMetadata(entity);
-			this.getDataPublisher().publishLayer(entity);
+			this.getMetadataPublisher().publishMetadata(object);
+			this.getDataPublisher().publishLayer(object,style);
 
 		}
 
@@ -95,24 +92,24 @@ public class Publisher {
 	/**
 	 * Method to unpublish
 	 * 
-	 * @param entity
+	 * @param object
 	 * @param exist
 	 * @throws Exception
 	 */
-	public void unpublish(GeographicEntity entity, boolean exist) throws Exception {
+	public void unpublish(GeographicMetaObject object, boolean exist) throws Exception {
 
 		if (this.settings.getPublicationSettings().isUnpublishData()) {
 			if (!exist) {
-				this.getDataPublisher().deleteOnlyFeatureType(entity);
+				this.getDataPublisher().deleteOnlyFeatureType(object);
 
 			} else {
-				this.getDataPublisher().deleteLayer(entity);
+				this.getDataPublisher().deleteLayer(object);
 			}
 		}
 
 		if (this.settings.getPublicationSettings().isUnpublishMetadata()) {
 			try {
-				this.getMetadataPublisher().deleteMetadata(entity);
+				this.getMetadataPublisher().deleteMetadata(object);
 			} catch (Exception e) {
 				LOGGER.warn("metadata was yet deleted");
 			}

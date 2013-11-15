@@ -13,18 +13,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.fao.fi.gis.metadata.collection.species.SpeciesEntity.SpeciesProperty;
-import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
+import org.fao.fi.gis.metadata.association.GeographicMetaObjectProperty;
 import org.fao.fi.gis.metadata.authority.AuthorityEntity;
 import org.fao.fi.gis.metadata.entity.EntityAddin;
-import org.fao.fi.gis.metadata.entity.EntityProperty;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
 import org.fao.fi.gis.metadata.entity.GeographicEntityImpl;
-import org.fao.fi.gis.metadata.entity.GisProperty;
-import org.fao.fi.gis.metadata.model.content.MetadataContent;
-import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
-import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
-import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.fao.fi.gis.metadata.model.MetadataConfig;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -39,7 +33,7 @@ import org.xml.sax.SAXException;
  */
 public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 
-	public enum RfbProperty implements EntityProperty{
+	public enum RfbProperty implements GeographicMetaObjectProperty{
 		
 		FAO (AuthorityEntity.FAO, true, true),
 		FLOD (AuthorityEntity.FLOD, true, true),
@@ -71,86 +65,31 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	}
 	
 	private FLODRfbEntity FLODRfbEntity;
-	private String refName;
-	private String style;
-	private Map<EntityProperty, List<String>> properties;
-	private Map<GisProperty, String> gisProperties;
-	
-	
-	public RfbEntity(String code, MetadataContent template,
-			Map<FeatureTypeProperty, Object> geoproperties,Map<EntityAddin, String> addins,
-			GeographicServerSettings gsSettings, MetadataCatalogueSettings metaSettings) throws URISyntaxException,
-			ParserConfigurationException, SAXException, IOException {
 
-		super(code, template,
-				geoproperties, addins,
-				gsSettings, metaSettings,
-				"rfb", code);
+	
+	public RfbEntity(String code, Map<EntityAddin,String> addins, MetadataConfig config) throws URISyntaxException, ParserConfigurationException, SAXException, IOException {
+
+		super(code, addins, config);
 		
 		this.FLODRfbEntity = new FLODRfbEntity(code);
-		this.setRefName();
+		this.setRefName(this.FLODRfbEntity.getName());
 		
-		this.setSpecificProperties();
-		
-		this.style = addins.get(EntityAddin.Style);
-		this.setGisProperties();
-		this.setRfbAbstract();
-	}
-
-	
-	public String getViewerProj() {
-		return "4326";
-	}
-
-	public CoordinateReferenceSystem getCRS() {
-		return DefaultGeographicCRS.WGS84;
-	}
-
-	private void setRefName(){
-		this.refName = this.FLODRfbEntity.getName(); //here we don't want to acronym between parentesis as it is in FIGIS
-	}
-	
-	/**
-	 * Get the Ref name (name that will be used in metadata title)
-	 * 
-	 */
-	public String getRefName() {
-		return this.refName;
-	}
-
-	public void setSpecificProperties(){
-		properties = new HashMap<EntityProperty, List<String>>();
+		Map<GeographicMetaObjectProperty, List<String>>properties = new HashMap<GeographicMetaObjectProperty, List<String>>();
 		properties.put(RfbProperty.FIGIS, Arrays.asList(this.getCode(),
 													    this.FLODRfbEntity.getName()));
 		
 		properties.put(RfbProperty.FLOD, Arrays.asList(this.FLODRfbEntity.getRfbCodedEntity()));
 		properties.put(SpeciesProperty.FAO, Arrays.asList(this.getMetaIdentifier()));
-	}
-	
-	public Map<EntityProperty, List<String>> getSpecificProperties() {
-		return this.properties;
+		this.setSpecificProperties(properties);
+
+		this.setFigisDomain("rfbs");
+		this.setFigisId(this.FLODRfbEntity.getCode());
+		this.setFigisViewerId(this.FLODRfbEntity.getCode());
+
+		this.setRfbAbstract();
 	}
 
-	public String getFigisId() {
-		return this.getCode();
-	}
-	
-	
-	private void setGisProperties(){
-		this.gisProperties  = new HashMap<GisProperty,String>();
-		gisProperties.put(GisProperty.STYLE, this.style);
-		gisProperties.put(GisProperty.PROJECTION, "EPSG:4326");
-		
-	}
-	
-	
-	public Map<GisProperty, String> getGisProperties() {
-		return this.gisProperties;
-	}
-	
-	public String getFactsheet(){
-		return "http://www.fao.org/fishery/"+this.getDomainName() + "/" + this.getFigisId();
-	}
+
 	
 	private void setRfbAbstract() throws ParserConfigurationException, SAXException, IOException{
 		
@@ -167,7 +106,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 		NodeList nodeList = geoCoverage.getElementsByTagName("fi:Text");
 		if(nodeList.getLength() > 0){
 			String abstractText = nodeList.item(0).getTextContent().replaceAll("<p>", "").replaceAll("</p>", "");
-			this.getTemplate().setAbstract(abstractText);
+			this.getConfig().getContent().setAbstract(abstractText);
 		}
 	
 	}

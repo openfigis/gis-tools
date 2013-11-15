@@ -1,5 +1,6 @@
 package org.fao.fi.gis.metadata.util;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +10,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
+import org.geotoolkit.data.FeatureCollection;
+import org.geotoolkit.data.FeatureStore;
+import org.geotoolkit.data.FeatureStoreFinder;
+import org.geotoolkit.data.query.QueryBuilder;
+import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
+import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
+import org.geotoolkit.storage.DataStoreException;
+import org.opengis.feature.Feature;
+import org.opengis.feature.type.Name;
+import org.opengis.parameter.ParameterValueGroup;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -204,6 +215,31 @@ public final class FeatureTypeUtils {
 		} catch (Exception e) {
 			LOGGER.warn("error during computation - Re-attempt bounding box computation");
 		}
+
+		return map;
+	}
+	
+	/**
+	 * 
+	 * @param url
+	 * @return
+	 * @throws DataStoreException 
+	 * @throws MalformedURLException 
+	 */
+	public static Map<FeatureTypeProperty, Object> computeFeatureTypeProperties(String url) throws DataStoreException, MalformedURLException {
+	
+		Map<FeatureTypeProperty, Object> map = new HashMap<FeatureTypeProperty, Object>();
+		
+		URL pURL = new URL(url);
+		final ParameterValueGroup params = ShapefileDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
+	    Parameters.getOrCreate(ShapefileDataStoreFactory.URLP, params).setValue(pURL);
+	    final FeatureStore shpStore = FeatureStoreFinder.open(params);
+		Name pName = shpStore.getNames().iterator().next();
+		FeatureCollection<Feature> pFC = shpStore.createSession(true).getFeatureCollection(QueryBuilder.all(pName));
+
+		map.put(FeatureTypeProperty.CRS, pFC.getFeatureType().getCoordinateReferenceSystem());
+		map.put(FeatureTypeProperty.COUNT, pFC.size());
+		map.put(FeatureTypeProperty.BBOX, pFC.getEnvelope());
 
 		return map;
 	}

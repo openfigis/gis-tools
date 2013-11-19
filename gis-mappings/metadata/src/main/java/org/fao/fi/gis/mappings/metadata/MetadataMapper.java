@@ -1,6 +1,8 @@
 package org.fao.fi.gis.mappings.metadata;
 
 import java.net.MalformedURLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +65,7 @@ public class MetadataMapper {
 	/**
 	 * Get the mappings between coded entity URI & GIS metadata URI
 	 * 
+	 * @param authority
 	 * @return
 	 */
 	public Map<String, Map<LayerProperty,String>> getMappings(String authority) {
@@ -107,6 +110,74 @@ public class MetadataMapper {
 		return results;
 	}
 
+	
+	
+	/**
+	 * Get the the list of LayerProperty for a layer that matches a list of
+	 * identifiers for a given authority. Typically to be used to search
+	 * intersections for a list of FLOD identifiers.
+	 * 
+	 * @param authority
+	 * @param identifierList
+	 * @return
+	 */
+	public Map<String, Map<LayerProperty, String>> getMappings(
+			String authority, List<String> identifierList) {
+		Map<String, Map<LayerProperty, String>> results = null;
+
+		List<Layer> layers = wmsCapabilities.getCapability().getLayer()
+				.getLayer();
+		if (layers != null) {
+			results = new HashMap<String, Map<LayerProperty, String>>();
+			for (Layer layer : layers) {
+
+				String key = null;
+
+				// Add both metadataURI, name & title
+				Map<LayerProperty, String> layerProperties = new HashMap<LayerProperty, String>();
+				List<String> identifiers = new ArrayList<String>();
+				for (Identifier identifier : layer.getIdentifier()) {
+					if (identifier.getAuthority().matches(authority)) {
+						identifiers.add(identifier.getValue());
+					}
+				}
+
+				if (identifiers.containsAll(identifierList)) {
+					key = "";
+					for (int i = 0; i < identifiers.size(); i++) {
+						if (i == 0) {
+							key += identifiers.get(i);
+						} else {
+							key += "_x_" + identifiers.get(i);
+						}
+					}
+
+					// get xml Metadata
+					List<MetadataURL> metadataList = layer.getMetadataURL();
+					if (metadataList.size() > 0) {
+						for (MetadataURL metadata : metadataList) {
+							if (metadata.getFormat().matches("text/xml")) {
+								layerProperties.put(LayerProperty.NAME,
+										layer.getName());
+								layerProperties.put(LayerProperty.TITLE,
+										layer.getTitle());
+								layerProperties.put(LayerProperty.METADATAURL,
+										metadata.getOnlineResource().getHref());
+							}
+						}
+					}
+				}
+
+				if (key != null) {
+					results.put(key, layerProperties);
+				}
+			}
+		}
+
+		return results;
+	}
+	
+	
 	/**
 	 * Main class
 	 * 
@@ -115,12 +186,33 @@ public class MetadataMapper {
 	 */
 	public static void main(String[] args) throws JAXBException {
 
-		String baseUrl = "http://www.fao.org/figis/geoserver";
-		String workspace = "species";
+		//example1 (species)
+		String baseUrl1 = "http://www.fao.org/figis/geoserver";
+		String workspace1 = "species";
 
-		MetadataMapper mapper = new MetadataMapper(baseUrl, workspace);
-		Map<String, Map<LayerProperty, String>> results = mapper
+		MetadataMapper mapper1 = new MetadataMapper(baseUrl1, workspace1);
+		Map<String, Map<LayerProperty, String>> results1 = mapper1
 				.getMappings("FLOD");
+
+		for (Entry<String, Map<LayerProperty, String>> entry : results1
+				.entrySet()) {
+			System.out.println(entry.getKey() + " | "
+					+ entry.getValue().get(LayerProperty.NAME) + " | "
+					+ entry.getValue().get(LayerProperty.TITLE) + " | "
+					+ entry.getValue().get(LayerProperty.METADATAURL));
+		}
+		
+		//example2 (intersection)
+		String baseUrl2 = "http://www.fao.org/figis/geoserver";
+		String workspace2 = "GeoIntersection";
+
+		MetadataMapper mapper2 = new MetadataMapper(baseUrl2, workspace2);
+		Map<String, Map<LayerProperty, String>> results = mapper2
+				.getMappings(
+						"FLOD",
+						Arrays.asList(
+								"http://www.fao.org/figis/flod/entities/codedentity/82961bac-deac-4eb4-a68b-e96f9730d783",
+								"http://www.fao.org/figis/flod/entities/codedentity/4306965f-2a65-11b2-8090-fc5bf243aae4"));
 
 		for (Entry<String, Map<LayerProperty, String>> entry : results
 				.entrySet()) {

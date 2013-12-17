@@ -61,8 +61,8 @@ public class MetadataGenerator {
 					.getPublicationSettings().getCodelistURL());
 			
 		}else if(collectionType.matches("eez")){
-			set = CollectionUtils.parseEezList(config.getSettings()
-					.getPublicationSettings().getCodelistURL());
+			String file = config.getSettings().getPublicationSettings().getCodelistURL().replaceAll("&amp;", "&");
+			set = CollectionUtils.parseEezList(file);
 			
 		}else if(collectionType.matches("rfb")){
 			set = CollectionUtils.parseRfbList(config.getSettings()

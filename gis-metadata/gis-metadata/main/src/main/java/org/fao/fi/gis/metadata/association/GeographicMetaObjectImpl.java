@@ -355,16 +355,20 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 	
 	public Envelope getBBOX() {
 		Envelope bbox = null;
-		if (this.geoproperties.containsKey(FeatureTypeProperty.BBOX)) {
-			bbox = (Envelope) this.geoproperties.get(FeatureTypeProperty.BBOX);
+		if(this.geoproperties != null){
+			if (this.geoproperties.containsKey(FeatureTypeProperty.BBOX)) {
+				bbox = (Envelope) this.geoproperties.get(FeatureTypeProperty.BBOX);
+			}
 		}
 		return bbox;
 	}
 
 	public int getFeaturesCount() {
 		Integer count = 0;
-		if (this.geoproperties.containsKey(FeatureTypeProperty.COUNT)) {
-			count = (Integer) this.geoproperties.get(FeatureTypeProperty.COUNT);
+		if(this.geoproperties != null){
+			if (this.geoproperties.containsKey(FeatureTypeProperty.COUNT)) {
+				count = (Integer) this.geoproperties.get(FeatureTypeProperty.COUNT);
+			}
 		}
 		return count;
 	}
@@ -372,8 +376,10 @@ public class GeographicMetaObjectImpl implements GeographicMetaObject {
 
 	public CoordinateReferenceSystem getCRS() {
 		CoordinateReferenceSystem crs = null;
-		if (!this.geoproperties.containsKey(FeatureTypeProperty.CRS)) {
-			crs = (CoordinateReferenceSystem) this.geoproperties.get(FeatureTypeProperty.CRS);
+		if(this.geoproperties != null){
+			if (!this.geoproperties.containsKey(FeatureTypeProperty.CRS)) {
+				crs = (CoordinateReferenceSystem) this.geoproperties.get(FeatureTypeProperty.CRS);
+			}
 		}
 		return crs;
 	}

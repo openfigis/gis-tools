@@ -438,7 +438,7 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 			// note: in the future we should see to customize the SHAPE-ZIP so
 			// it handles the metadata. This will require Geoserver
 			// developements
-			String shpFileName = "FAO_" + object.getTargetLayerName();
+			String shpFileName = object.getTemplate().getOrganizationContact().getAcronym()+"_" + object.getTargetLayerName();
 			DefaultOnlineResource wfsResource2 = new DefaultOnlineResource();
 			wfsResource2.setLinkage(new URI(object.getGeographicServerSettings().getUrl() + "/"
 					+ object.getGeographicServerSettings().getTargetWorkspace()

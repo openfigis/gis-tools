@@ -59,11 +59,13 @@ public final class FeatureTypeUtils {
 		double maxPosX = 180;
 
 		try {
-
-			URL url = new URL(settings.getUrl() + "/" + settings.getSourceWorkspace()
+			String wfsRequest= settings.getUrl() + "/" + settings.getSourceWorkspace()
 					+ "/ows?service=wfs&version=1.0.0&request=GetFeature"
 					+ "&typeName=" + settings.getSourceLayer() + "&cql_filter=" + settings.getSourceAttribute()
-					+ "='" + code + "'");
+					+ "='" + code + "'";
+			LOGGER.info("== WFS GetFeature Request ==");
+			LOGGER.info(wfsRequest);
+			URL url = new URL(wfsRequest);
 			
 			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
 					.newInstance();

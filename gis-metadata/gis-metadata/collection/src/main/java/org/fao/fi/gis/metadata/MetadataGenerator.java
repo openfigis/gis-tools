@@ -157,11 +157,21 @@ public class MetadataGenerator {
 					
 					// PUBLISH ACTION
 					if (action.matches("PUBLISH")) {
-						String style = set.get(code).get(EntityAddin.Style);
-						LOGGER.debug(style);
-						publisher.publish(metaObject, style, exist);
-						size = size + 1;	
-						LOGGER.info(size + " published metalayers");
+						String style = config.getSettings()
+										.getPublicationSettings().getStyle();
+						
+						if(style == null){
+							style = set.get(code).get(EntityAddin.Style);
+						}
+						
+						if(style != null){
+							LOGGER.debug(style);
+							publisher.publish(metaObject, style, exist);
+							size = size + 1;	
+							LOGGER.info(size + " published metalayers");
+						}else{
+							LOGGER.warn("No style configured");
+						}
 					
 					// UNPUBLISH ACTION
 					}else if (action.matches("UNPUBLISH")) {

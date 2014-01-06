@@ -46,6 +46,7 @@
 			<date>2013-10-31</date>								<!-- publication date -->
 			<version>1.0</version>								<!-- version -->
 			<buffer>2</buffer>									<!-- numeric buffer value (in degrees) to set a geographic buffer for map bounding box -->
+			<style>somestyle</style>							<!-- style to apply to the published layer -->
 			<test>true</test>									<!-- true will publish only one layer/metadata - TO USE INITIALLY to test the publication -->
 			<figis>true</figis>									<!-- if it is a FIGIS data collection -->
 

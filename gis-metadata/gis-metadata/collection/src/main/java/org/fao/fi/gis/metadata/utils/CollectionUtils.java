@@ -175,7 +175,6 @@ public final class CollectionUtils {
 					String mrgid = obj.get("code").getAsJsonObject().get("value").getAsString().split("http://www.fao.org/figis/flod/entities/eezcode/")[1];
 					
 					Map<EntityAddin,String> addins = new HashMap<EntityAddin,String>();
-					addins.put(EntityAddin.Style, "polygon");
 					eezList.put(mrgid, addins);
 				}
 			}

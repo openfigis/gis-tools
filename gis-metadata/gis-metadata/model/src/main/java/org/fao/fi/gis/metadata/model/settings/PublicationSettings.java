@@ -25,6 +25,7 @@ public class PublicationSettings{
 	private String collectionType;
 	private String date;
 	private String version;
+	private String style;
 	private double buffer;
 	private boolean test;
 	private boolean figis;
@@ -198,6 +199,22 @@ public class PublicationSettings{
 	}
 	
 	
+	/**
+	 * @return the style
+	 */
+	public String getStyle() {
+		return style;
+	}
+
+
+	/**
+	 * @param style the style to set
+	 */
+	public void setStyle(String style) {
+		this.style = style;
+	}
+
+
 	/**
 	 * @return the test
 	 */

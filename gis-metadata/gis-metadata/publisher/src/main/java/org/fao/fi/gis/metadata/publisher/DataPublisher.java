@@ -174,10 +174,19 @@ public class DataPublisher {
 			fte.setNativeBoundingBox(-180.0, -90.0, 180.0, 90.0, "EPSG:4326");
 			fte.setLatLonBoundingBox(-180.0, -90.0, 180.0, 90.0, "EPSG:4326");
 		}
-
+		
 		// virtual table (sql view)
 		if(method == PublicationMethod.SQLVIEW){
-			VTGeometryEncoder gte = new VTGeometryEncoder("THE_GEOM",
+			
+			//determine the geometry name
+			String geometryName = "the_geom";
+			String storeType = this.GSReader.getDatastore(this.trgWorkspace, this.trgDatastore).getStoreType();
+			if(storeType.matches("Oracle NG")){
+				geometryName = "THE_GEOM";
+			}
+			
+			//configure the sql view
+			VTGeometryEncoder gte = new VTGeometryEncoder(geometryName,
 					"MultiPolygon", "4326");
 			String sql = "SELECT * FROM " + this.srcLayer + " WHERE "
 					+ this.srcAttribute + " = '" + object.getCode() + "'";

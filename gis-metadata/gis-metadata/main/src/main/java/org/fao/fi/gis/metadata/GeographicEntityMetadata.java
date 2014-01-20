@@ -46,7 +46,6 @@ import org.geotoolkit.metadata.iso.quality.DefaultScope;
 import org.geotoolkit.metadata.iso.spatial.DefaultGeometricObjects;
 import org.geotoolkit.metadata.iso.spatial.DefaultVectorSpatialRepresentation;
 import org.geotoolkit.util.SimpleInternationalString;
-
 import org.opengis.metadata.citation.DateType;
 import org.opengis.metadata.citation.OnLineFunction;
 import org.opengis.metadata.citation.OnlineResource;
@@ -330,6 +329,8 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		DefaultLegalConstraints legalConstraints = new DefaultLegalConstraints();
 		legalConstraints.setUseConstraints(Arrays.asList(Restriction.COPYRIGHT,
 				Restriction.LICENSE));
+		String copyright = "©";
+		
 		legalConstraints
 				.setUseLimitations(Arrays
 						.asList(
@@ -340,7 +341,8 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 
 						// Usage for bibliography
 								new SimpleInternationalString(
-										"Usage subject to mandatory citation: (c) "+object.getTemplate().getOrganizationContact().getAcronym()+", "
+										"Usage subject to mandatory citation: "
+												+copyright+" "+object.getTemplate().getOrganizationContact().getAcronym()+", "
 												+ c.get(Calendar.YEAR)+ ". "
 												+ object.getTemplate().getCollection()+ ". "
 												+ object.getMetaTitle()

@@ -37,12 +37,6 @@
 			<artifactId>gis-metadata-main</artifactId>
 		</dependency>
 		
-		<!-- JAXB -->
-		<dependency>
-			<groupId>com.sun.xml.bind</groupId>
-			<artifactId>jaxb-impl</artifactId>
-		</dependency>
-		
 		
 		<!-- Junit -->
 		<dependency>

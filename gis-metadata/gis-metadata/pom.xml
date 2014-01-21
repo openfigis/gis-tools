@@ -67,14 +67,6 @@
 				<version>${geotoolkit.version}</version>
 			</dependency>
 
-			
-			<!-- JAXB -->
-			<dependency>
-				<groupId>com.sun.xml.bind</groupId>
-				<artifactId>jaxb-impl</artifactId>
-				<version>2.2.7</version>
-			</dependency>
-			
 			<!-- JTS -->
 			<dependency>
 				<groupId>com.vividsolutions</groupId>

@@ -66,6 +66,11 @@
 				<artifactId>geotk-metadata</artifactId>
 				<version>${geotoolkit.version}</version>
 			</dependency>
+			<dependency>
+				<groupId>org.geotoolkit.pending</groupId>
+				<artifactId>geotk-shapefile</artifactId>
+				<version>${geotoolkit.version}</version>
+			</dependency>
 
 			<!-- JTS -->
 			<dependency>

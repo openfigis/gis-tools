@@ -33,6 +33,10 @@
 			<groupId>org.geotoolkit</groupId>
 			<artifactId>geotk-metadata</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.geotoolkit.pending</groupId>
+			<artifactId>geotk-shapefile</artifactId>
+		</dependency>
 		
 		<!-- JTS -->
 		<dependency>

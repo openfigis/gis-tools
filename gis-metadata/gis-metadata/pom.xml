@@ -57,18 +57,8 @@
 				<version>${geotoolkit.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.geotoolkit.pending</groupId>
-				<artifactId>geotk-filter</artifactId>
-				<version>${geotoolkit.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.geotoolkit</groupId>
 				<artifactId>geotk-referencing</artifactId>
-				<version>${geotoolkit.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.geotoolkit.pending</groupId>
-				<artifactId>geotk-shapefile</artifactId>
 				<version>${geotoolkit.version}</version>
 			</dependency>
 			<dependency>
@@ -77,6 +67,13 @@
 				<version>${geotoolkit.version}</version>
 			</dependency>
 
+			
+			<!-- JAXB -->
+			<dependency>
+				<groupId>com.sun.xml.bind</groupId>
+				<artifactId>jaxb-impl</artifactId>
+				<version>2.2.7</version>
+			</dependency>
 			
 			<!-- JTS -->
 			<dependency>

@@ -79,7 +79,7 @@ public class MetadataPublisher {
 			icfg.setStyleSheet("_none_");
 			icfg.setValidate(Boolean.FALSE);
 
-			File tmp = new File("./metadata.xml");
+			File tmp = File.createTempFile(metadata.getFileIdentifier(), ".xml");
 			XML.marshal(metadata, tmp);
 
 			long id = client.insertMetadata(icfg, tmp); // insert metadata

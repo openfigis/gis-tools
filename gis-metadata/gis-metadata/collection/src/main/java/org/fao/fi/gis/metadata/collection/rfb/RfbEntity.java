@@ -93,6 +93,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 	
 	private void setRfbAbstract() throws ParserConfigurationException, SAXException, IOException{
 		
+		this.getConfig().getContent().setAbstract(""); //reinitialize by default
 		String figisID = this.getAddins().get(EntityAddin.FigisId);
 		
 		System.out.println(figisID);

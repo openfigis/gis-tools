@@ -1,5 +1,6 @@
 package org.fao.fi.gis.metadata.util;
 
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -7,6 +8,7 @@ import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
@@ -29,6 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -58,7 +61,9 @@ public final class FeatureTypeUtils {
 		double maxNegX = -180;
 		double maxPosX = 180;
 
-		try {
+		
+		try{
+
 			String wfsRequest= settings.getUrl() + "/" + settings.getSourceWorkspace()
 					+ "/ows?service=wfs&version=1.0.0&request=GetFeature"
 					+ "&typeName=" + settings.getSourceLayer() + "&cql_filter=" + settings.getSourceAttribute()
@@ -67,20 +72,18 @@ public final class FeatureTypeUtils {
 			LOGGER.info(wfsRequest);
 			URL url = new URL(wfsRequest);
 			
-			DocumentBuilderFactory dbFactory = DocumentBuilderFactory
-					.newInstance();
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-
-			NodeList nList = null;
 			Document doc = dBuilder.parse(url.openStream());
 			doc.getDocumentElement().normalize();
-			nList = doc.getElementsByTagName("gml:featureMember");
+			
+			NodeList nList = doc.getElementsByTagName("gml:featureMember");
 			if (nList != null) {
-				LOGGER.info(nList.getLength() + " features");
+				map = new HashMap<FeatureTypeProperty, Object>();
 				if (nList.getLength() > 0) {
-
+					LOGGER.info(nList.getLength() + " features");
+					
 					// ADD COUNT
-					map = new HashMap<FeatureTypeProperty, Object>();
 					map.put(FeatureTypeProperty.COUNT, nList.getLength());
 
 					for (int temp = 0; temp < nList.getLength(); temp++) {
@@ -192,11 +195,14 @@ public final class FeatureTypeUtils {
 						
 						map.put(FeatureTypeProperty.CRS, DefaultGeographicCRS.WGS84); //TODO in the future we should manage the crs....
 					}
+				}else{
+					//no feature members
+					map.put(FeatureTypeProperty.COUNT, 0);
+					
 				}
 			}
-
 		} catch (Exception e) {
-			LOGGER.warn("error during computation - Re-attempt bounding box computation");
+			LOGGER.warn("Error trying to perform WFS GetFeature request");
 		}
 
 		return map;

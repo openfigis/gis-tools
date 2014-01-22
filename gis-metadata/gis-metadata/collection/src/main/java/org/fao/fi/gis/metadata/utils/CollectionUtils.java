@@ -132,6 +132,7 @@ public final class CollectionUtils {
 					String style = eElement.getAttribute("style");
 					String fid = eElement.getAttribute("fid");
 					addins.put(EntityAddin.Style, style);
+					addins.put(EntityAddin.FigisId, fid);
 					
 					rfbList.put(rfb, addins);
 

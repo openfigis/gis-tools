@@ -83,7 +83,7 @@ public class RfbEntity extends GeographicEntityImpl implements GeographicEntity{
 		this.setSpecificProperties(properties);
 
 		this.setFigisDomain("rfbs");
-		this.setFigisId(this.FLODRfbEntity.getCode());
+		this.setFigisId(addins.get(EntityAddin.FigisId));
 		this.setFigisViewerId(this.FLODRfbEntity.getCode());
 
 		this.setRfbAbstract();

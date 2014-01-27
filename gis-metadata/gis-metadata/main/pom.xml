@@ -20,18 +20,15 @@
 			<artifactId>slf4j-simple</artifactId>
 		</dependency>
 
+
 		<!-- GeoToolKit -->
 		<dependency>
 			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-utility</artifactId>
+			<artifactId>geotk-metadata</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.geotoolkit</groupId>
 			<artifactId>geotk-referencing</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.geotoolkit</groupId>
-			<artifactId>geotk-metadata</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.geotoolkit.pending</groupId>

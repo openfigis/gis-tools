@@ -2,8 +2,8 @@ package org.fao.fi.gis.metadata.util;
 
 import java.util.List;
 
+import org.apache.sis.xml.Namespaces;
 import org.fao.fi.gis.metadata.entity.GeographicEntity;
-import org.geotoolkit.xml.Namespaces;
 
 public final class Utils {
 

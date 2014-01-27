@@ -3,11 +3,11 @@ package org.fao.fi.gis.metadata.publisher;
 import java.io.File;
 import java.util.EnumSet;
 
+import org.apache.sis.xml.XML;
 import org.fao.fi.gis.metadata.GeographicEntityMetadata;
 import org.fao.fi.gis.metadata.association.GeographicMetaObject;
 import org.fao.fi.gis.metadata.model.settings.MetadataCatalogueSettings;
 import org.fao.fi.gis.metadata.model.settings.PublicationSettings;
-import org.geotoolkit.xml.XML;
 import org.jdom.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

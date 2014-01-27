@@ -8,6 +8,8 @@ import java.util.Map;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+
+import org.apache.sis.storage.DataStoreException;
 import org.fao.fi.gis.metadata.feature.FeatureTypeProperty;
 import org.fao.fi.gis.metadata.model.settings.GeographicServerSettings;
 import org.geotoolkit.data.FeatureCollection;
@@ -15,10 +17,9 @@ import org.geotoolkit.data.FeatureIterator;
 import org.geotoolkit.data.FeatureStore;
 import org.geotoolkit.data.FeatureStoreFinder;
 import org.geotoolkit.data.query.QueryBuilder;
-import org.geotoolkit.data.shapefile.ShapefileDataStoreFactory;
+import org.geotoolkit.data.shapefile.ShapefileFeatureStoreFactory;
 import org.geotoolkit.parameter.Parameters;
 import org.geotoolkit.referencing.crs.DefaultGeographicCRS;
-import org.geotoolkit.storage.DataStoreException;
 import org.opengis.feature.Feature;
 import org.opengis.feature.type.Name;
 import org.opengis.geometry.BoundingBox;
@@ -214,8 +215,8 @@ public final class FeatureTypeUtils {
 		Map<FeatureTypeProperty, Object> map = new HashMap<FeatureTypeProperty, Object>();
 		
 		URL pURL = new URL(url);
-		final ParameterValueGroup params = ShapefileDataStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
-	    Parameters.getOrCreate(ShapefileDataStoreFactory.URLP, params).setValue(pURL);
+		final ParameterValueGroup params = ShapefileFeatureStoreFactory.PARAMETERS_DESCRIPTOR.createValue();
+	    Parameters.getOrCreate(ShapefileFeatureStoreFactory.URLP, params).setValue(pURL);
 	    final FeatureStore shpStore = FeatureStoreFinder.open(params);
 		Name pName = shpStore.getNames().iterator().next();
 		FeatureCollection<Feature> pFC = shpStore.createSession(true).getFeatureCollection(QueryBuilder.all(pName));
@@ -328,7 +329,7 @@ public final class FeatureTypeUtils {
 
 		}
 		
-		map.put(FeatureTypeProperty.CRS, pFC.getFeatureType().getCoordinateReferenceSystem());
+		map.put(FeatureTypeProperty.CRS, DefaultGeographicCRS.WGS84);
 		map.put(FeatureTypeProperty.COUNT, pFC.size());
 		map.put(FeatureTypeProperty.BBOX, bounds);
 

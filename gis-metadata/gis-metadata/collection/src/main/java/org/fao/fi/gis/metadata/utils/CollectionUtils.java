@@ -154,6 +154,7 @@ public final class CollectionUtils {
 	 * @return
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static Map<String, Map<EntityAddin,String>> parseEezList(String file)
 			throws IOException {
 
@@ -189,5 +190,52 @@ public final class CollectionUtils {
 		return eezList;
 	}
 
+	
+	/**
+	 * Method to parse the unique source of EEZs from Geoserver
+	 * 
+	 * 
+	 * @param file
+	 * @return
+	 * @throws IOException
+	 */
+	public static Map<String, Map<EntityAddin,String>> parseEezListFromGeoserver(String file)
+			throws IOException {
 
+		Map<String, Map<EntityAddin,String>> eezList = new HashMap<String, Map<EntityAddin,String>>();
+		
+		JsonReader reader = null;
+		try {
+			// read Geoserver data
+			URL dataURL = new URL(file);
+		
+			reader = new JsonReader(new InputStreamReader(dataURL.openStream()));
+			JsonParser parser = new JsonParser();
+			JsonObject flodJsonObject = parser.parse(reader).getAsJsonObject();
+
+			JsonArray bindings = flodJsonObject.get("features").getAsJsonArray();
+
+			if (bindings.size() > 0) {
+				for(int i = 0;i<bindings.size();i++){
+					JsonObject obj = bindings.get(i).getAsJsonObject().get("properties").getAsJsonObject();
+					String mrgid = obj.get("mrgid").getAsString();
+					String label = obj.get("eez").getAsString();
+
+					Map<EntityAddin,String> addins = new HashMap<EntityAddin,String>();
+					addins.put(EntityAddin.Label, label);
+					eezList.put(mrgid, addins);
+				}
+			}
+
+			reader.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+
+		return eezList;
+	}
+
+	
 }

@@ -52,18 +52,19 @@ public class EezEntity extends GeographicEntityImpl implements GeographicEntity{
 		
 	}
 	
-	private FLODEezEntity FLODEezEntity;
+	//private FLODEezEntity FLODEezEntity;
 
 	
 	public EezEntity(String code, Map<EntityAddin,String> addins, MetadataConfig config) throws URISyntaxException {
 		
 		super(code, addins, config);
 		
-		this.FLODEezEntity = new FLODEezEntity(code);
-		this.setRefName(this.FLODEezEntity.getName());
+		//this.FLODEezEntity = new FLODEezEntity(code);
+		//this.setRefName(this.FLODEezEntity.getName());
+		this.setRefName(addins.get(EntityAddin.Label));
 		
 		Map<GeographicMetaObjectProperty, List<String>> properties = new HashMap<GeographicMetaObjectProperty, List<String>>();		
-		properties.put(EezProperty.FLOD, Arrays.asList(this.FLODEezEntity.getCodedEntity()));
+		//properties.put(EezProperty.FLOD, Arrays.asList(this.FLODEezEntity.getCodedEntity()));
 		properties.put(EezProperty.VLIZ, Arrays.asList(this.getMetaIdentifier()));
 
 		this.setSpecificProperties(properties);

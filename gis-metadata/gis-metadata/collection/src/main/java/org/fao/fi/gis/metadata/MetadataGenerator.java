@@ -62,7 +62,7 @@ public class MetadataGenerator {
 			
 		}else if(collectionType.matches("eez")){
 			String file = config.getSettings().getPublicationSettings().getCodelistURL().replaceAll("&amp;", "&");
-			set = CollectionUtils.parseEezList(file);
+			set = CollectionUtils.parseEezListFromGeoserver(file);
 			
 		}else if(collectionType.matches("rfb")){
 			set = CollectionUtils.parseRfbList(config.getSettings()
@@ -112,8 +112,8 @@ public class MetadataGenerator {
 				flodResponse = flodEntity.getFlodContent();
 				
 			}else if(collectionType.matches("eez")){
-				FLODEezEntity flodEntity = new FLODEezEntity(code);
-				flodResponse = flodEntity.getFlodContent();
+				//FLODEezEntity flodEntity = new FLODEezEntity(code);
+				flodResponse = new JsonObject();
 				
 			}else if(collectionType.matches("rfb")){
 				FLODRfbEntity flodEntity = new FLODRfbEntity(code);
@@ -142,48 +142,51 @@ public class MetadataGenerator {
 					}
 						
 					//configure entity
-					Integer featureCount = (Integer) geoproperties.get(FeatureTypeProperty.COUNT);
-					if (featureCount != 0) {
-						if(collectionType.matches("species")){			
-							entity = new SpeciesEntity(code, set.get(code), config);
-		
-						}else if(collectionType.matches("eez")){
-							entity = new EezEntity(code, set.get(code), config);	
-							
-						}else if(collectionType.matches("rfb")){
-							entity = new RfbEntity(code, set.get(code), config);
-							
-						}
-						
-						boolean figis = config.getSettings().getPublicationSettings().isFigis();
-						GeographicMetaObject metaObject = new GeographicMetaObjectImpl(Arrays.asList(entity), geoproperties, null, set.get(code), config);
-						
-						// PUBLISH ACTION
-						if (action.matches("PUBLISH")) {
-							String style = config.getSettings()
-											.getPublicationSettings().getStyle();
-							
-							if(style == null){
-								style = set.get(code).get(EntityAddin.Style);
-							}
-							
-							if(style != null){
-								LOGGER.debug(style);
-								publisher.publish(metaObject, style, exist);
-								size = size + 1;	
-								LOGGER.info(size + " published metalayers");
-							}else{
-								LOGGER.warn("No style configured");
-							}
-						
-						// UNPUBLISH ACTION
-						}else if (action.matches("UNPUBLISH")) {
-							publisher.unpublish(metaObject, exist);
-						}
-						
-					}else{
-						metalist.add(code);
+					Integer featureCount = 0;
+					if(action.matches("PUBLISH")) {
+						featureCount = (Integer) geoproperties.get(FeatureTypeProperty.COUNT);
 					}
+					
+					if(collectionType.matches("species")){			
+						entity = new SpeciesEntity(code, set.get(code), config);
+	
+					}else if(collectionType.matches("eez")){
+						entity = new EezEntity(code, set.get(code), config);	
+						
+					}else if(collectionType.matches("rfb")){
+						entity = new RfbEntity(code, set.get(code), config);
+						
+					}
+					
+					boolean figis = config.getSettings().getPublicationSettings().isFigis();
+					if(featureCount == 0) geoproperties = null;
+					GeographicMetaObject metaObject = new GeographicMetaObjectImpl(Arrays.asList(entity), geoproperties, null, set.get(code), config);
+					
+					// PUBLISH ACTION
+					if (action.matches("PUBLISH") && featureCount > 0) {
+						String style = config.getSettings()
+										.getPublicationSettings().getStyle();
+						
+						if(style == null){
+							style = set.get(code).get(EntityAddin.Style);
+						}
+						
+						if(style != null){
+							LOGGER.debug(style);
+						}else{
+							LOGGER.warn("Applying default style");
+							style = "polygon";
+						}
+						
+						publisher.publish(metaObject, style, exist);
+						size = size + 1;	
+						LOGGER.info(size + " published metalayers");
+					
+					// UNPUBLISH ACTION
+					}else if (action.matches("UNPUBLISH")) {
+						publisher.unpublish(metaObject, exist);
+					}
+						
 				}else{
 					metalist.add(code);
 				}

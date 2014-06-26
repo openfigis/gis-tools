@@ -3,9 +3,8 @@ package org.fao.fi.gis.metadata.publisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTPublisher;
 import it.geosolutions.geoserver.rest.GeoServerRESTReader;
 import it.geosolutions.geoserver.rest.HTTPUtils;
-import it.geosolutions.geoserver.rest.GeoServerRESTPublisher.UploadMethod;
+import it.geosolutions.geoserver.rest.decoder.RESTDataStore.DBType;
 import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder;
-import it.geosolutions.geoserver.rest.encoder.GSLayerEncoder21;
 import it.geosolutions.geoserver.rest.encoder.GSResourceEncoder.ProjectionPolicy;
 import it.geosolutions.geoserver.rest.encoder.authorityurl.GSAuthorityURLInfoEncoder;
 import it.geosolutions.geoserver.rest.encoder.feature.GSFeatureTypeEncoder;
@@ -180,9 +179,10 @@ public class DataPublisher {
 			
 			//determine the geometry name
 			String geometryName = "the_geom";
-			String storeType = this.GSReader.getDatastore(this.trgWorkspace, this.trgDatastore).getStoreType();
-			if(storeType.matches("Oracle NG")){
-				geometryName = "THE_GEOM";
+			DBType storeType = this.GSReader.getDatastore(this.trgWorkspace, this.trgDatastore).getType();
+			if(storeType.name().matches("oracle")){
+				LOGGER.info("Oracle datastore - set the_geom to uppercase");
+				geometryName = geometryName.toUpperCase();
 			}
 			
 			//configure the sql view
@@ -207,7 +207,7 @@ public class DataPublisher {
 		fte.addMetadataLinkInfo(mde2);
 
 		// layer
-		final GSLayerEncoder layerEncoder = new GSLayerEncoder21();
+		final GSLayerEncoder layerEncoder = new GSLayerEncoder();
 		layerEncoder.setDefaultStyle(style);
 
 		// add authorityURL & identifiers
@@ -232,7 +232,9 @@ public class DataPublisher {
 		if(method == PublicationMethod.SQLVIEW){
 			publish = GSPublisher.publishDBLayer(trgWorkspace, trgDatastore, fte, layerEncoder);
 			
-		}else if(method == PublicationMethod.SHAPEFILE){
+		}
+		
+		/*else if(method == PublicationMethod.SHAPEFILE){
 			
 			//prepare shapefile
 			URL url = new URL(shapefile);
@@ -245,7 +247,7 @@ public class DataPublisher {
 			publish = GSPublisher.publishShp(trgWorkspace, trgDatastore,
 					new NameValuePair[0], object.getTargetLayerName(),
 					UploadMethod.FILE, file.toURI(), fte, layerEncoder);
-		}
+		}*/
 		return publish;
 
 	}

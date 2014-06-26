@@ -11,6 +11,6 @@ This module contains code to automatically build code mappings, such as:
 
 gis-metadata
 ------------
-This module contains code to facilitate the management of GIS data & associated OGC/ISO standard metadata (ISO19115/19139).
+This module contains code to facilitate the management of GIS data & associated OGC/ISO standard metadata (ISO19115/19139). This project has been moved to the [GEMS (GIS Enforcing Metadata & Semantic) project](https://github.com/openfigis/gems)
 
 

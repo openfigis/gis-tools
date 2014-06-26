@@ -481,7 +481,6 @@ public class GeographicEntityMetadata extends DefaultMetadata {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setIdentificationInfo() throws URISyntaxException,
 			ParseException {
 

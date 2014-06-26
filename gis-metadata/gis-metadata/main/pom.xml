@@ -10,7 +10,7 @@
 	
 	<groupId>org.fao.fi.gis</groupId>
 	<artifactId>gis-metadata-main</artifactId>
-	<version>1.0-SNAPSHOT</version>
+	
 	<name>main</name>
 	<url>http://www.fao.org/fi</url>
 

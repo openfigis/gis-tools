@@ -1,4 +1,4 @@
-package org.fao.fi.gis.metadata;
+package org.fao.fi.gis.metadata.app;
 
 import java.io.File;
 import java.util.Arrays;
